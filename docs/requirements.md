@@ -113,7 +113,9 @@ Session states:
 ### 2.5 Streaks and rewards
 
 - **Streak (lenient)**: a calendar day counts if the user finished at least one session that day (on time, catch-up, or reading ahead). A day whose session was already read early also counts when that date arrives, so reading ahead before a trip keeps the streak alive.
-- **Reward card — "Time Bookmark"** (name tentative): every **14 consecutive streak days** earns one card. A card turns one `late` (yellow) session into `onTime` (green). It cannot be used on `overdue` (unread) sessions.
+- **Reward card — "Time Bookmark"** (UI name: 时光书签): every **14 consecutive streak days** earns one card. A card turns one `late` (yellow) session into `onTime` (green). It cannot be used on `overdue` (unread) sessions.
+  - Cards can be saved, up to **3**. While holding 3, completing another 14-day run earns nothing.
+  - No anti-cheating: reading many days ahead and letting the streak grow is acceptable. This is a self-motivation tool.
 
 ## 3. Daily reading page
 
