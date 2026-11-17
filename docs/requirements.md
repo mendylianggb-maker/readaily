@@ -189,13 +189,18 @@ Tapping a date opens that date's reading page **directly** (no intermediate popu
 | `overdue` | Reading page (catch-up) |
 | `onTime` / `late` | Reading page for re-reading; status does not change, Finish button is replaced by "Done" |
 | `upcoming`, next unread session | Reading page (read ahead) |
-| `upcoming`, not next | Toast: read ahead in order, next is MM/DD |
+| `upcoming`, not next | Reading page in **preview** mode (the user may just want a peek). No Finish button; the bottom shows "Read ahead in order: next is MM/DD". |
 | Blank | Nothing |
 
 ### 4.4 Where other actions live
 
 - **Reschedule**: when overdue sessions ≥ 7, a banner appears at the top of the calendar (and on the home page): "9 days behind · [Reschedule]".
 - **Use a Time Bookmark**: tap the bookmark counter in the stats header to enter selection mode. Yellow dates are highlighted; tapping one converts it to green and uses a card. Tap again or Cancel to exit.
+- **Explaining the Time Bookmark**: users must understand what the card does.
+  - When the first card is earned, show a short explainer: what it is, how it was earned (14-day streak), what it does (turns one yellow catch-up day green), and how to use it.
+  - A "?" icon next to the counter in the stats header reopens the explainer.
+  - Selection mode shows a hint bar: "Pick a yellow day to mark it as on time".
+  - With 0 cards, tapping the counter shows the explainer plus progress toward the next card (e.g. "9 / 14 days").
 
 ### 4.5 Home page week strip
 

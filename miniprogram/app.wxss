@@ -1,0 +1,10 @@
+page {
+  background: #f7f7f7;
+  color: #222222;
+  font-size: 32rpx;
+  line-height: 1.6;
+}
+
+.container {
+  padding: 32rpx;
+}

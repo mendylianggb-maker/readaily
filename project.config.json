@@ -1,0 +1,16 @@
+{
+  "description": "Readaily: read a book in daily 10-minute sessions",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "readaily",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true
+  },
+  "packOptions": { "ignore": [], "include": [] },
+  "editorSetting": { "tabIndent": "insertSpaces", "tabSize": 2 }
+}
