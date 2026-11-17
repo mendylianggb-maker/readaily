@@ -1,15 +1,30 @@
-# 微信开发者工具本地配置
+# WeChat DevTools local config
 project.private.config.json
 
-# 依赖
+# Dependencies
 node_modules/
 miniprogram_npm/
 
-# 系统 / 编辑器
+# Secrets and keys
+.env
+.env.*
+*.pem
+*.key
+*.p12
+private.*.key
+
+# Test books (copyrighted content, never commit)
+test-books/
+*.epub
+*.mobi
+*.azw
+*.azw3
+
+# OS / editor
 .DS_Store
 .vscode/
 .idea/
 *.log
 
-# Claude Code 项目说明（不同步）
+# Local-only Claude Code notes
 CLAUDE.md
