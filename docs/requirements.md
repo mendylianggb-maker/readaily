@@ -2,7 +2,7 @@
 
 Readaily is a WeChat mini program that splits a book into daily ~10-minute reading sessions and tracks daily check-ins. Everything runs locally on the device: no backend, no cloud storage.
 
-Status: draft. Sections are added as each area is discussed.
+Status: v1 draft. All four areas discussed; details may still change.
 
 ---
 
@@ -149,11 +149,11 @@ Global (same for all books), saved locally.
 |---------|---------|
 | Font size | 4 levels |
 | Line height | 3 levels |
-| Font | Sans-serif (default) / Serif. System fonts only; some Android devices have no CJK serif font and fall back to sans-serif. |
+| Font | Sans-serif (default) / Serif, system fonts only. Mainly useful for English books: Latin serif fonts exist on both iOS (e.g. Georgia) and Android (Noto Serif), so the difference is always visible. For Chinese, some Android devices have no CJK serif font and fall back to sans-serif. |
 | Background | White / Sepia / Dark |
 | Dark mode | Follows the system dark mode automatically; the user can still pick manually. |
 
-Custom fonts (e.g. Kaiti) are out of scope: a full CJK font is several MB, too large for the 2 MB main package, and loading it remotely needs hosting.
+Custom fonts are out of scope for v1. A full CJK font is several MB, too large for the 2 MB main package. A Latin-only font (e.g. a book serif, ~100–300 KB) could be bundled later.
 
 ### 3.5 Out of scope for v1
 
@@ -161,4 +161,53 @@ Highlights, notes, bookmarks, text-to-speech, full-text search, horizontal pagin
 
 ## 4. Check-in calendar
 
-TBD.
+### 4.1 Scope
+
+- The calendar shows the **currently reading book's** schedule only.
+- Streak and total reading days are **global** (across all books). Past books' history is viewed from the bookshelf.
+
+### 4.2 Layout
+
+- **Stats header**: streak, total reading days, Time Bookmark count (x/3), current book progress, estimated finish date.
+- **Month view** (swipe between months):
+
+| Mark | Meaning |
+|------|---------|
+| Green | `onTime` (including read ahead) |
+| Yellow | `late` (caught up) |
+| Gray | `overdue` |
+| Outline | `upcoming` |
+| Blank | No session scheduled |
+| Circled | Today |
+
+### 4.3 Tapping a date
+
+Tapping a date opens that date's reading page **directly** (no intermediate popup).
+
+| State | Tap result |
+|-------|-----------|
+| `overdue` | Reading page (catch-up) |
+| `onTime` / `late` | Reading page for re-reading; status does not change, Finish button is replaced by "Done" |
+| `upcoming`, next unread session | Reading page (read ahead) |
+| `upcoming`, not next | Toast: read ahead in order, next is MM/DD |
+| Blank | Nothing |
+
+### 4.4 Where other actions live
+
+- **Reschedule**: when overdue sessions ≥ 7, a banner appears at the top of the calendar (and on the home page): "9 days behind · [Reschedule]".
+- **Use a Time Bookmark**: tap the bookmark counter in the stats header to enter selection mode. Yellow dates are highlighted; tapping one converts it to green and uses a card. Tap again or Cancel to exit.
+
+### 4.5 Home page week strip
+
+The home page shows a Mon–Sun row with this week's marks, so the user sees progress without opening the calendar.
+
+### 4.6 Finishing a book
+
+- A celebration screen with a short animation (e.g. confetti).
+- Summary: total days, on-time rate, total characters/words read.
+- An encouraging message that suggests rewarding yourself, picked at random from a small set, e.g.:
+  - 读完一整本书了！今天奖励一下自己吧，去喝杯喜欢的饮料。
+  - 坚持了 N 天，这本书是你的了。给自己放个不看手机的下午吧。
+  - 又读完一本。挑个小礼物送给认真读书的自己。
+- The book moves to "Finished" on the bookshelf.
+- Prompt to import or pick the next book (optional, not forced).
