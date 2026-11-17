@@ -2,15 +2,38 @@
   "description": "Readaily: read a book in daily 10-minute sessions",
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
-  "appid": "touristappid",
+  "appid": "wxdcbafb5713f5f2a0",
   "projectname": "readaily",
   "setting": {
     "es6": true,
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "urlCheck": true
+    "urlCheck": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "packOptions": { "ignore": [], "include": [] },
-  "editorSetting": { "tabIndent": "insertSpaces", "tabSize": 2 }
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  },
+  "simulatorPluginLibVersion": {}
 }
