@@ -119,7 +119,45 @@ Session states:
 
 ## 3. Daily reading page
 
-TBD.
+### 3.1 Entry points
+
+- Home page **Start** → today's session.
+- Home page **Catch up**, or tapping a date on the calendar → that date's session.
+
+### 3.2 Layout
+
+- **Header**: date, day number, estimated time (e.g. "11/17 · Day 23 · ~10 min"), chapter range of this session, whole-book progress bar.
+- **Body**: plain text with paragraphs. When a new chapter starts inside a session, its title is shown inline.
+- **End of session**: a **Finish** button appears only after scrolling to the end.
+
+### 3.3 Behavior
+
+| # | Topic | Decision |
+|---|-------|----------|
+| 1 | Paging | Vertical scrolling. Horizontal page turning is out of scope for v1. |
+| 2 | Completion | The session counts as read only when the user taps **Finish** at the end (no auto check-in). No minimum reading time. |
+| 3 | After finishing | Show a check-in animation and the current streak; show an extra notice when a Time Bookmark card is earned. Then offer **Read next day** (read ahead) and **Catch up** (only if there are overdue sessions). |
+| 4 | Leaving mid-session | Remember the scroll position within the session and restore it next time. |
+| 5 | Keep screen on | `wx.setKeepScreenOn` while reading. |
+| 6 | Reading time | Record actual time spent per session silently (not shown); used later to calibrate reading speed. |
+
+### 3.4 Reading settings
+
+Global (same for all books), saved locally.
+
+| Setting | Options |
+|---------|---------|
+| Font size | 4 levels |
+| Line height | 3 levels |
+| Font | Sans-serif (default) / Serif. System fonts only; some Android devices have no CJK serif font and fall back to sans-serif. |
+| Background | White / Sepia / Dark |
+| Dark mode | Follows the system dark mode automatically; the user can still pick manually. |
+
+Custom fonts (e.g. Kaiti) are out of scope: a full CJK font is several MB, too large for the 2 MB main package, and loading it remotely needs hosting.
+
+### 3.5 Out of scope for v1
+
+Highlights, notes, bookmarks, text-to-speech, full-text search, horizontal paging, custom fonts.
 
 ## 4. Check-in calendar
 
