@@ -51,9 +51,69 @@ When the bookshelf is empty, show a short illustrated guide explaining how to ge
 
 ---
 
-## 2. Splitting
+## 2. Splitting and schedule
 
-TBD.
+### 2.1 Daily amount
+
+- User picks a daily reading time: **5 / 10 (default) / 15 / 20 minutes**.
+- Language is detected per book at import (CJK characters majority → Chinese, otherwise English).
+- Default reading speeds (configurable constants, to be tuned later):
+
+| Language | Unit | Speed | 10 minutes ≈ |
+|----------|------|-------|--------------|
+| Chinese | characters | 400 / min | 4,000 characters |
+| English | words | 150 / min | 1,500 words |
+
+- Mixed-language text: CJK characters and English words are counted together.
+- The import confirmation page shows the estimated number of days.
+- Later: auto-calibrate speed from the user's actual reading time.
+
+### 2.2 Where to cut
+
+Principle: prefer chapter ends, otherwise paragraph boundaries, never mid-sentence. Let `T` be the daily target.
+
+| Case | Rule |
+|------|------|
+| A chapter ends while the session is within 70%–130% of `T` | Cut at the chapter end |
+| Chapter is short (session < 70% of `T` at its end) | Continue into the next chapter; several chapters can share one day |
+| Chapter is long | Cut at the paragraph boundary closest to `T`; the chapter spans several days |
+| Remainder of a chapter < 30% of `T` | Merge it into the previous day |
+| A single paragraph > 2 × `T` | Cut at the sentence end (`。！？.!?`) closest to `T` |
+| Book has no chapters | Cut by paragraphs only |
+
+Each session shows its chapter range at the top, e.g. "Chapter 3 (2/3)" or "Chapters 5–6".
+
+Implementation note: a plan is just a list of `(startOffset, endOffset, date)` entries; re-splitting only recomputes this list and never touches the stored text.
+
+### 2.3 Date-based schedule
+
+Every session is assigned a calendar date: session 1 on the start date, session 2 the next day, and so on.
+
+Session states:
+
+| State | Meaning | Calendar color |
+|-------|---------|----------------|
+| `upcoming` | Date not reached, not read | — |
+| `overdue` | Date passed, not read | gray / empty |
+| `onTime` | Read on its date, or read early | green |
+| `late` | Read after its date (catch-up) | yellow |
+
+- **Reading today**: the home page shows today's session and the number of overdue sessions, e.g. "Today 11/17 · Day 23 [Start]" and "1 day to catch up (11/16) [Catch up]".
+- **Skipping**: no explicit skip action. The user simply reads today's session; earlier unread sessions stay `overdue` and can be opened from the calendar any time.
+- **Reading ahead**: allowed. The user can keep reading future sessions in order (e.g. before a holiday or trip). A session read early counts as `onTime` and is green.
+- **Rescheduling**: when overdue sessions reach **7 or more**, offer a **Reschedule** button that moves all unread sessions to start from today (clears the backlog, pushes the end date out). Optional; the user can keep catching up instead.
+- **Changing daily time**: re-split the unread part and reschedule it starting today. Finished sessions and check-ins are unchanged.
+
+### 2.4 Switching books
+
+- **Start a new book**: its session 1 is scheduled for today.
+- **The previous book is paused**: its finished records are kept.
+- **Resume a paused book**: continue from the first unread session; all unread sessions are rescheduled from today (equivalent to an automatic Reschedule), so the pause does not create a backlog.
+
+### 2.5 Streaks and rewards
+
+- **Streak (lenient)**: a calendar day counts if the user finished at least one session that day (on time, catch-up, or reading ahead). A day whose session was already read early also counts when that date arrives, so reading ahead before a trip keeps the streak alive.
+- **Reward card — "Time Bookmark"** (name tentative): every **14 consecutive streak days** earns one card. A card turns one `late` (yellow) session into `onTime` (green). It cannot be used on `overdue` (unread) sessions.
 
 ## 3. Daily reading page
 
