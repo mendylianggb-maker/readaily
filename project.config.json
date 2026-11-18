@@ -2,7 +2,7 @@
   "description": "Readaily: read a book in daily 10-minute sessions",
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
-  "appid": "wxdcbafb5713f5f2a0",
+  "appid": "wx0cbf077cc5373771",
   "projectname": "readaily",
   "setting": {
     "es6": true,
