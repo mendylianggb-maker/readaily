@@ -1,6 +1,6 @@
 # Readaily
 
-A WeChat mini program that splits a book into daily ~10-minute reading sessions and tracks daily check-ins. Everything runs locally on the device: no backend, no cloud storage.
+Readaily (published as 日积月读, "read a little every day") is a WeChat mini program that splits a book into daily ~10-minute reading sessions and tracks daily check-ins. Everything runs locally on the device: no backend, no cloud storage.
 
 - Import `.txt` / `.epub` files from WeChat chat
 - Date-based reading schedule with catch-up and read-ahead
