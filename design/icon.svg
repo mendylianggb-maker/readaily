@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Mini program avatar: an open book with a page turning, pages piling up underneath. -->
+  <rect width="512" height="512" fill="#3E6B4E"/>
+  <path d="M110 378 C 158 370, 214 376, 256 396 C 298 376, 354 370, 402 378 L 402 392 C 354 384, 298 390, 256 410 C 214 390, 158 384, 110 392 Z" fill="#B8C9BB"/>
+  <path d="M110 362 C 158 354, 214 360, 256 380 C 298 360, 354 354, 402 362 L 402 376 C 354 368, 298 374, 256 394 C 214 374, 158 368, 110 376 Z" fill="#D3DDD3"/>
+  <path d="M256 196 C 214 176, 158 170, 110 178 L 110 350 C 158 342, 214 348, 256 368 Z" fill="#F6F1E7"/>
+  <path d="M256 196 C 298 176, 354 170, 402 178 L 402 350 C 354 342, 298 348, 256 368 Z" fill="#E9E1D0"/>
+  <path d="M136 212 C 172 206, 208 212, 236 224 M136 240 C 172 234, 208 240, 236 252 M136 268 C 172 262, 208 268, 236 280 M136 296 C 172 290, 208 296, 236 308" stroke="#C9BFA9" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M256 196 C 286 168, 322 140, 366 122 C 362 196, 330 290, 256 368 Z" fill="#FFFDF8"/>
+  <path d="M256 196 C 286 168, 322 140, 366 122" stroke="#E2B354" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M256 196 L 256 368" stroke="#2C4F39" stroke-width="5" stroke-linecap="round"/>
+</svg>
