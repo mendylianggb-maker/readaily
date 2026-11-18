@@ -1,3 +1,22 @@
 <view class="container">
-  <text>import (TODO)</text>
+  <view class="card">
+    <view>从微信聊天记录里选一本书（txt 或 epub）。</view>
+    <view class="text-secondary">可以先把文件发到「文件传输助手」。</view>
+  </view>
+
+  <button class="btn-primary" bindtap="onChooseFile" loading="{{loading}}" disabled="{{loading}}">
+    选择文件
+  </button>
+
+  <view wx:if="{{error}}" class="card text-danger error">{{error}}</view>
+
+  <view wx:if="{{file}}" class="card file-info">
+    <view class="file-name">{{file.name}}</view>
+    <view class="text-secondary">{{file.ext}} · {{file.sizeText}}</view>
+  </view>
+
+  <view wx:if="{{preview}}" class="card">
+    <view class="text-secondary">开头预览</view>
+    <text class="preview" user-select>{{preview}}</text>
+  </view>
 </view>

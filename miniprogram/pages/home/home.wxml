@@ -1,3 +1,7 @@
 <view class="container">
-  <text>home (TODO)</text>
+  <view class="card">
+    <view>还没有在读的书</view>
+    <view class="text-secondary">导入一本书，开始每天 10 分钟的阅读。</view>
+  </view>
+  <button class="btn-primary" bindtap="onImport">导入书</button>
 </view>

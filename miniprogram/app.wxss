@@ -1,10 +1,42 @@
+/* Design tokens. Restyle the app by changing these. */
 page {
-  background: #f7f7f7;
-  color: #222222;
+  --color-bg: #f7f7f7;
+  --color-surface: #ffffff;
+  --color-text: #222222;
+  --color-text-secondary: #888888;
+  --color-primary: #2f7d4f;
+  --color-danger: #c0392b;
+  --radius: 16rpx;
+  --space: 32rpx;
+
+  background: var(--color-bg);
+  color: var(--color-text);
   font-size: 32rpx;
   line-height: 1.6;
 }
 
 .container {
-  padding: 32rpx;
+  padding: var(--space);
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: var(--space);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-radius: var(--radius);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+  font-size: 26rpx;
+}
+
+.text-danger {
+  color: var(--color-danger);
 }

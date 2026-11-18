@@ -1,0 +1,16 @@
+.error,
+.file-info {
+  margin-top: var(--space);
+}
+
+.file-name {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.preview {
+  display: block;
+  margin-top: 16rpx;
+  white-space: pre-wrap;
+  font-size: 28rpx;
+}
