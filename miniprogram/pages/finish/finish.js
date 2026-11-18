@@ -9,7 +9,7 @@ const MESSAGES = [
   '{days} 天，一页一页读到了最后。今晚早点睡，做个好梦。',
   '这本书读完了，你也比开始时多了一点点东西。出去走走，奖励一下自己。'
 ]
-const COLORS = ['#4caf7a', '#f2c14e', '#e57373', '#64b5f6', '#ba68c8']
+const COLORS = ['#3E6B4E', '#E2B354', '#C98B6B', '#7C95A8', '#A3B18A']
 
 Page({
   data: {

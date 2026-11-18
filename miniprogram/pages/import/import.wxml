@@ -5,13 +5,13 @@
   </view>
 
   <button
-    class="{{book ? '' : 'btn-primary'}}"
+    class="choose {{book ? 'btn-secondary' : 'btn-primary'}}"
     bindtap="onChooseFile"
     loading="{{loading}}"
     disabled="{{loading}}"
   >{{book ? '重新选择' : '选择文件'}}</button>
 
-  <view wx:if="{{error}}" class="card text-danger gap-top">{{error}}</view>
+  <view wx:if="{{error}}" class="banner text-danger gap-top">{{error}}</view>
 
   <block wx:if="{{book}}">
     <view class="card gap-top">

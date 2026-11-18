@@ -42,11 +42,14 @@
 }
 
 .headline {
-  font-size: 56rpx;
+  font-family: var(--font-serif);
+  font-size: 60rpx;
   font-weight: 700;
 }
 
 .book-title {
+  font-family: var(--font-serif);
+  color: var(--color-text-secondary);
   font-size: 34rpx;
   margin: 8rpx 0 48rpx;
 }
@@ -60,11 +63,14 @@
 }
 
 .stat-value {
-  font-size: 34rpx;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
 .message {
+  font-family: var(--font-serif);
   margin: 24rpx 0 56rpx;
   font-size: 32rpx;
   line-height: 1.8;

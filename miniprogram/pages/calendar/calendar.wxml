@@ -1,16 +1,16 @@
 <view class="container">
-  <view class="card stats">
+  <view class="stats">
     <view class="stat">
-      <view class="stat-value">{{stats.streak}}</view>
-      <view class="text-secondary">连续天数</view>
+      <view class="text-secondary">连续</view>
+      <view class="stat-value serif primary">{{stats.streak}}<text class="stat-unit">天</text></view>
     </view>
     <view class="stat">
-      <view class="stat-value">{{stats.total}}</view>
-      <view class="text-secondary">累计天数</view>
+      <view class="text-secondary">累计</view>
+      <view class="stat-value serif">{{stats.total}}<text class="stat-unit">天</text></view>
     </view>
     <view class="stat" bindtap="onCardsTap">
-      <view class="stat-value">🔖 {{stats.cards}}/3</view>
       <view class="text-secondary">时光书签 <text class="help" catchtap="onExplain">?</text></view>
+      <view class="stat-value serif gold">{{stats.cards}}<text class="stat-unit">/ 3</text></view>
     </view>
   </view>
 
@@ -18,13 +18,13 @@
     《{{stats.title}}》已读 {{stats.progress}}% · 预计 {{stats.endLabel}} 读完
   </view>
 
-  <view wx:if="{{stats.rescheduleReason}}" class="card banner">
+  <view wx:if="{{stats.rescheduleReason}}" class="banner">
     <text wx:if="{{stats.rescheduleReason === 'behind'}}">落后 {{stats.overdue}} 天了</text>
     <text wx:else>已经提前读了 {{stats.ahead}} 天</text>
-    <text class="link" bindtap="onReschedule">重新排期</text>
+    <text class="link" bindtap="onReschedule">重新排期 ›</text>
   </view>
 
-  <view wx:if="{{bookmarkMode}}" class="card banner bookmark-bar">
+  <view wx:if="{{bookmarkMode}}" class="banner">
     <text>选一个黄色的日子，把它标为按时完成</text>
     <text class="link" bindtap="onCancelBookmark">取消</text>
   </view>
@@ -32,11 +32,11 @@
   <view class="card">
     <view class="month-bar">
       <text class="arrow" bindtap="onPrevMonth">‹</text>
-      <text>{{year}} 年 {{month}} 月</text>
+      <text class="serif month">{{year}} 年 {{month}} 月</text>
       <text class="arrow" bindtap="onNextMonth">›</text>
     </view>
     <view class="grid">
-      <view wx:for="{{weekdays}}" wx:key="*this" class="cell text-secondary">{{item}}</view>
+      <view wx:for="{{weekdays}}" wx:key="*this" class="cell weekday text-secondary">{{item}}</view>
       <view
         wx:for="{{cells}}"
         wx:key="key"

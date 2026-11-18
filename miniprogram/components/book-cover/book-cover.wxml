@@ -1,0 +1,8 @@
+<view class="cover cover-{{size}}">
+  <image wx:if="{{coverPath}}" class="image" src="{{coverPath}}" mode="aspectFill" />
+  <view wx:else class="placeholder" style="background: {{tone.bg}}">
+    <view class="title" style="color: {{tone.ink}}">{{title}}</view>
+    <view wx:if="{{author}}" class="author" style="color: {{tone.sub}}">{{author}}</view>
+    <slot></slot>
+  </view>
+</view>

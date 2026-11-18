@@ -1,35 +1,84 @@
-/* Design tokens. Restyle the app by changing these. */
+/* Design tokens ("Paper" style). Restyle the app by changing these. */
 page {
-  --color-bg: #f7f7f7;
-  --color-surface: #ffffff;
-  --color-text: #222222;
-  --color-text-secondary: #888888;
-  --color-primary: #2f7d4f;
-  --color-danger: #c0392b;
-  --radius: 16rpx;
+  --color-bg: #F6F1E7;
+  --color-surface: #FFFDF8;
+  --color-border: #E6DDCD;
+  --color-soft: #EDE5D6;
+  --color-text: #2B2620;
+  --color-text-secondary: #7A6F62;
+  --color-primary: #3E6B4E;
+  --color-primary-dark: #2C4F39;
+  --color-on-primary: #FFFDF8;
+  --color-warn-bg: #F3E6C9;
+  --color-gold: #9A6F1E;
+  --color-danger: #A8442F;
+  --font-serif: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+  --font-sans: -apple-system, "PingFang SC", "Helvetica Neue", Roboto, sans-serif;
+  --radius: 28rpx;
   --space: 32rpx;
 
   background: var(--color-bg);
   color: var(--color-text);
-  font-size: 32rpx;
+  font-family: var(--font-sans);
+  font-size: 30rpx;
   line-height: 1.6;
 }
 
 .container {
-  padding: var(--space);
+  padding: 24rpx 40rpx 48rpx;
+}
+
+.serif {
+  font-family: var(--font-serif);
 }
 
 .card {
   background: var(--color-surface);
+  border: 1rpx solid var(--color-border);
   border-radius: var(--radius);
-  padding: var(--space);
-  margin-bottom: var(--space);
+  padding: 40rpx;
+  margin-bottom: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(80, 60, 30, 0.06);
 }
 
-.btn-primary {
+button.btn-primary {
   background: var(--color-primary);
-  color: #ffffff;
-  border-radius: var(--radius);
+  color: var(--color-on-primary);
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  letter-spacing: 4rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  padding: 0;
+}
+
+button.btn-primary::after,
+button.btn-secondary::after {
+  border: none;
+}
+
+button.btn-primary[disabled] {
+  background: var(--color-soft);
+  color: var(--color-text-secondary);
+}
+
+button.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+  border-radius: 20rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  height: 88rpx;
+  line-height: 84rpx;
+  padding: 0;
+}
+
+.link {
+  color: var(--color-primary);
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .text-secondary {
@@ -41,10 +90,66 @@ page {
   color: var(--color-danger);
 }
 
-/* Session state marks, shared by home week strip and calendar. */
-.state-onTime { background: #4caf7a; color: #fff; }
-.state-late { background: #f2c14e; color: #fff; }
-.state-overdue { background: #dddddd; color: #888; }
-.state-today, .state-upcoming { border: 2rpx solid #c8c8c8; }
-.state-none { color: #bbbbbb; }
-.is-today { box-shadow: 0 0 0 4rpx var(--color-primary); }
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  margin-bottom: 28rpx;
+  border-radius: 24rpx;
+  background: var(--color-warn-bg);
+  font-size: 28rpx;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  background: var(--color-soft);
+  font-size: 26rpx;
+}
+
+/* Option chips used by the reader Aa panel and settings. */
+.opt {
+  padding: 10rpx 24rpx;
+  margin: 6rpx 14rpx 6rpx 0;
+  border: 1rpx solid var(--color-border);
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  background: var(--color-surface);
+}
+
+.opt.on {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* Progress ring: set --p (0-100) and the size inline. */
+.ring {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring-inner {
+  border-radius: 50%;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Session state marks, shared by the home week strip and the calendar. */
+.state-onTime { background: #3E6B4E; color: #FFFDF8; }
+.state-late { background: #E2B354; color: #2B2620; }
+.state-overdue { background: #E3DACB; color: #5E5448; }
+.state-today, .state-upcoming { border: 2rpx dashed #CBBFAA; color: #7A6F62; }
+.state-none { color: #B5AA98; }
+.is-today { border: 4rpx solid #3E6B4E; color: #3E6B4E; font-weight: 700; }
+.state-onTime.is-today, .state-late.is-today { box-shadow: 0 0 0 4rpx #FFFDF8 inset; }

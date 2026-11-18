@@ -12,6 +12,7 @@ const SAVE_SCROLL_MS = 1000
 Page({
   data: {
     loaded: false,
+    indent: true, // first-line indent for Chinese text
     header: null, // { dateText, dayText, minutes, label, progress } or { title } for extras
     blocks: [], // { type: 'h' | 'p', text }
     mode: 'read', // read | reread | extra
@@ -28,8 +29,8 @@ Page({
     ],
     themeOptions: [
       { value: 'auto', label: '跟随系统' },
+      { value: 'paper', label: '纸色' },
       { value: 'light', label: '白色' },
-      { value: 'sepia', label: '护眼' },
       { value: 'dark', label: '夜间' }
     ],
     result: null // shown after finishing
@@ -85,6 +86,7 @@ Page({
     const chapters = library.getBookDetail(this.bookId).chapters
     const done = plan.sessions.filter((s) => s.done).length
 
+    const blocks = buildBlocks(text, chapters, session)
     wx.setNavigationBarTitle({ title: book.title })
     this.setData({
       loaded: true,
@@ -96,7 +98,10 @@ Page({
         label: session.label,
         progress: Math.round((done / plan.sessions.length) * 100)
       },
-      blocks: buildBlocks(text, chapters, session),
+      blocks,
+      indent: book.language !== 'en',
+      // Mid-chapter sessions have no inline heading, so show where we are.
+      continued: !blocks.length || blocks[0].type !== 'h',
       finishText: '完成阅读'
     })
 

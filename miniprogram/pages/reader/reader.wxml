@@ -7,25 +7,31 @@
     <view class="header-row">
       <text wx:if="{{mode === 'extra'}}">附加内容（不计入阅读天数）</text>
       <text wx:else>{{header.dateText}} · {{header.dayText}} · 约 {{header.minutes}} 分钟</text>
-      <text class="aa" bindtap="onTogglePanel">Aa</text>
+      <view class="aa" style="color: {{style.theme.text}}; border-color: {{style.theme.line}}" bindtap="onTogglePanel">Aa</view>
     </view>
-    <block wx:if="{{mode !== 'extra'}}">
-      <view wx:if="{{header.label}}" class="header-label">{{header.label}}</view>
-      <view class="progress"><view class="progress-bar" style="width: {{header.progress}}%"></view></view>
-    </block>
+    <view wx:if="{{mode !== 'extra'}}" class="progress" style="background: {{style.theme.line}}">
+      <view class="progress-bar" style="width: {{header.progress}}%; background: {{style.theme.accent}}"></view>
+    </view>
   </view>
 
   <view class="body">
-    <view wx:if="{{mode === 'extra'}}" class="chapter-title">{{header.title}}</view>
+    <view wx:if="{{mode !== 'extra' && continued && header.label}}" class="continued" style="color: {{style.theme.secondary}}">{{header.label}}</view>
+    <view wx:if="{{mode === 'extra'}}" class="chapter-title">
+      <text>{{header.title}}</text>
+      <view class="chapter-rule" style="background: {{style.theme.secondary}}"></view>
+    </view>
     <block wx:for="{{blocks}}" wx:key="index">
-      <view wx:if="{{item.type === 'h'}}" class="chapter-title">{{item.text}}</view>
-      <text wx:else class="para" user-select>{{item.text}}</text>
+      <view wx:if="{{item.type === 'h'}}" class="chapter-title">
+        <text>{{item.text}}</text>
+        <view class="chapter-rule" style="background: {{style.theme.secondary}}"></view>
+      </view>
+      <text wx:else class="para {{indent ? 'indent' : ''}}" user-select>{{item.text}}</text>
     </block>
   </view>
 
-  <view class="footer">
-    <button wx:if="{{mode === 'read'}}" class="btn-primary" bindtap="onFinish">{{finishText}}</button>
-    <view wx:elif="{{mode === 'reread'}}" class="footer-note">已读完 ✓</view>
+  <view class="footer" style="border-color: {{style.theme.line}}">
+    <button wx:if="{{mode === 'read'}}" class="btn-primary" style="background: {{style.theme.accent}}" bindtap="onFinish">{{finishText}}</button>
+    <view wx:elif="{{mode === 'reread'}}" class="footer-note" style="color: {{style.theme.secondary}}">已读完 ✓</view>
   </view>
 </view>
 
@@ -62,13 +68,13 @@
 <!-- Shown after finishing a session -->
 <view wx:if="{{result}}" class="mask" bindtap="onBack">
   <view class="sheet result" catchtap="noop">
-    <view class="sheet-icon">🎉</view>
-    <view class="sheet-title">打卡成功</view>
-    <view class="sheet-streak">已连续 {{result.streak}} 天</view>
-    <view wx:if="{{result.newCards > 0}}" class="sheet-card">获得 {{result.newCards}} 张时光书签 🔖</view>
+    <view class="sheet-check">✓</view>
+    <view class="sheet-title serif">打卡成功</view>
+    <view class="sheet-streak">已连续 <text class="sheet-num">{{result.streak}}</text> 天</view>
+    <view wx:if="{{result.newCards > 0}}" class="sheet-card">获得 {{result.newCards}} 张时光书签</view>
     <button wx:if="{{result.todayIndex >= 0}}" class="btn-primary sheet-btn" bindtap="onReadToday">读今天的（{{result.todayLabel}}）</button>
-    <button wx:if="{{result.overdueIndex >= 0}}" class="{{result.todayIndex >= 0 ? '' : 'btn-primary'}} sheet-btn" bindtap="onCatchUp">继续补读 {{result.overdueLabel}}（还剩 {{result.overdueCount}} 天）</button>
-    <button wx:if="{{result.aheadIndex >= 0}}" class="sheet-btn" bindtap="onReadAhead">提前读 {{result.aheadLabel}}</button>
-    <button class="sheet-btn" bindtap="onBack">返回</button>
+    <button wx:if="{{result.overdueIndex >= 0}}" class="{{result.todayIndex >= 0 ? 'btn-secondary' : 'btn-primary'}} sheet-btn" bindtap="onCatchUp">继续补读 {{result.overdueLabel}}（还剩 {{result.overdueCount}} 天）</button>
+    <button wx:if="{{result.aheadIndex >= 0}}" class="btn-secondary sheet-btn" bindtap="onReadAhead">提前读 {{result.aheadLabel}}</button>
+    <view class="sheet-back" bindtap="onBack">返回</view>
   </view>
 </view>

@@ -6,5 +6,6 @@
   display: flex;
   justify-content: space-between;
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid var(--color-soft);
+  font-family: var(--font-serif);
 }

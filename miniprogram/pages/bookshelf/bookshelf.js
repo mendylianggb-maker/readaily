@@ -3,9 +3,23 @@ const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
 const { chooseDailyMinutes, confirm } = require('../../utils/ui')
 
-const STATUS_TEXT = { reading: '在读', paused: '暂停', finished: '读完' }
-const { placeholderColor } = require('../../utils/cover')
-const { formatAmount } = require('../../utils/text-stats')
+const STATUS_TEXT = { new: '未开始', reading: '在读', paused: '暂停', finished: '已读完' }
+const { readingMinutes } = require('../../utils/text-stats')
+
+/** Progress and the small line under each cover. */
+function shelfInfo(b) {
+  const plan = plans.loadPlan(b.id)
+  const done = plan ? plan.sessions.filter((s) => s.done).length : 0
+  const progress = plan ? Math.round((done / plan.sessions.length) * 100) : 0
+  let info
+  if (b.status === 'finished') info = plan ? '用了 ' + plan.sessions.length + ' 天' : ''
+  else if (plan) info = progress + '%'
+  else {
+    const minutes = readingMinutes(b.stats)
+    info = minutes >= 60 ? '约 ' + Math.round(minutes / 60) + ' 小时' : '约 ' + Math.max(1, Math.round(minutes)) + ' 分钟'
+  }
+  return { progress, info }
+}
 
 Page({
   data: {
@@ -26,12 +40,10 @@ Page({
         title: b.title,
         author: b.author,
         coverPath: b.coverPath,
-        coverColor: placeholderColor(b.title),
-        coverText: b.title.slice(0, 6),
-        status: b.status,
-        statusText: STATUS_TEXT[b.status] || '',
-        infoText: formatAmount(b.stats, b.language) + (b.chapterCount ? ' · ' + b.chapterCount + ' 章' : '')
+        status: b.status || 'new',
+        statusText: STATUS_TEXT[b.status] || STATUS_TEXT.new
       }))
+      .map((b) => Object.assign(b, shelfInfo(b)))
     this.setData({ books })
   },
 
@@ -96,7 +108,7 @@ Page({
       title: '删除《' + title + '》？',
       content: '正文和阅读进度会一起删除，打卡记录会保留。',
       confirmText: '删除',
-      confirmColor: '#c0392b',
+      confirmColor: '#A8442F',
       success: (res) => {
         if (!res.confirm) return
         library.deleteBook(id)

@@ -4,7 +4,7 @@
 const library = require('./library')
 const plans = require('./plan')
 const checkins = require('./checkins')
-const { todayKey, addDays, weekStart, shortLabel } = require('./dates')
+const { todayKey, addDays, weekStart, shortLabel, fromKey } = require('./dates')
 
 /**
  * Start reading a book (new or paused). The current book, if different, is paused.
@@ -105,6 +105,12 @@ function dateMap(plan, today) {
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日']
 
+/** "11月19日" and "星期四" for the home header. */
+function dateTitle(key) {
+  const d = fromKey(key)
+  return { date: d.getMonth() + 1 + '月' + d.getDate() + '日', weekday: '星期' + '日一二三四五六'[d.getDay()] }
+}
+
 /** Everything the home page shows. */
 function homeView() {
   const today = todayKey()
@@ -116,6 +122,7 @@ function homeView() {
   const base = {
     today,
     todayLabel: shortLabel(today),
+    dateTitle: dateTitle(today),
     streak: streak.length,
     cards: rewards.cards,
     newCards,
@@ -138,7 +145,9 @@ function homeView() {
   const done = plan.sessions.filter((s) => s.done).length
 
   return Object.assign(base, {
-    book: { id: book.id, title: book.title, coverPath: book.coverPath },
+    book: { id: book.id, title: book.title, author: book.author, coverPath: book.coverPath },
+    doneCount: done,
+    endLabel: shortLabel(plan.sessions.reduce((a, s) => (s.date > a ? s.date : a), today)),
     dailyMinutes: plan.dailyMinutes,
     totalSessions: plan.sessions.length,
     progress: Math.round((done / plan.sessions.length) * 100),

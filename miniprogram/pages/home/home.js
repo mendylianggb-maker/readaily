@@ -1,6 +1,5 @@
 const reading = require('../../utils/reading')
 const checkins = require('../../utils/checkins')
-const { placeholderColor } = require('../../utils/cover')
 const { BOOKMARK_EXPLAINER, confirmReschedule } = require('../../utils/ui')
 
 Page({
@@ -10,7 +9,6 @@ Page({
 
   onShow() {
     const view = reading.homeView()
-    if (view.book) view.book.coverColor = placeholderColor(view.book.title)
     this.setData({ view })
     if (view.newCards > 0) this.announceCard()
   },

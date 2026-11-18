@@ -1,6 +1,11 @@
 <view class="container">
+  <view class="head">
+    <view class="head-title serif">我的书</view>
+    <button class="btn-secondary import" bindtap="onImport">＋ 导入</button>
+  </view>
+
   <view wx:if="{{books.length === 0}}" class="card empty">
-    <view>书架上还没有书</view>
+    <view class="serif empty-title">书架上还没有书</view>
     <view class="text-secondary">把 txt 或 epub 发到微信「文件传输助手」，再回来导入。</view>
   </view>
 
@@ -14,16 +19,26 @@
       bindtap="onBookTap"
       bindlongpress="onBookLongPress"
     >
-      <view wx:if="{{item.statusText}}" class="badge badge-{{item.status}}">{{item.statusText}}</view>
-      <image wx:if="{{item.coverPath}}" class="cover" src="{{item.coverPath}}" mode="aspectFill" />
-      <view wx:else class="cover placeholder" style="background: {{item.coverColor}}">
-        <text class="placeholder-title">{{item.coverText}}</text>
-      </view>
+      <book-cover title="{{item.title}}" author="{{item.author}}" cover-path="{{item.coverPath}}" size="large">
+        <view class="marker">
+          <view wx:if="{{item.status === 'finished'}}" class="mark-done">✓</view>
+          <view wx:elif="{{item.status === 'new'}}" class="mark-new">新</view>
+          <view
+            wx:else
+            class="ring"
+            style="width: 88rpx; height: 88rpx; background: conic-gradient(rgba(43, 38, 32, 0.6) 0 {{item.progress}}%, rgba(255, 253, 248, 0.7) {{item.progress}}% 100%)"
+          >
+            <view class="ring-inner mark-ring-inner" style="width: 68rpx; height: 68rpx">{{item.progress}}%</view>
+          </view>
+        </view>
+      </book-cover>
       <view class="book-title">{{item.title}}</view>
-      <view class="text-secondary book-info">{{item.infoText}}</view>
+      <view class="book-meta">
+        <text class="badge badge-{{item.status}}">{{item.statusText}}</text>
+        <text class="text-secondary">{{item.info}}</text>
+      </view>
     </view>
   </view>
 
-  <button class="btn-primary import" bindtap="onImport">导入书</button>
-  <view wx:if="{{books.length}}" class="text-secondary hint">点书可以开始读或删除</view>
+  <view wx:if="{{books.length}}" class="text-secondary hint">点一本书可以开始读、查看附加内容或删除</view>
 </view>

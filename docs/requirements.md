@@ -6,6 +6,14 @@ Status: v1 draft. All four areas discussed; details may still change.
 
 ---
 
+## 0. Visual style
+
+"Paper": warm off-white background (#F6F1E7) with ink-dark text and a deep green accent (#3E6B4E). Titles, numbers, and reading text use serif type (system Songti on iOS; devices without a CJK serif font fall back to sans-serif). Interface text uses the system sans-serif.
+
+- Home: a date heading with two pills (streak, Time Bookmarks). The book card shows a small cover (or placeholder), title and author with the estimated finish date, and a progress ring; below it today's session and the Start button.
+- Total reading days are shown on the calendar page, not on home.
+- Design mock-ups were reviewed as three directions (Paper, bright, minimal); Paper was chosen.
+
 ## 1. Import
 
 ### 1.1 Why import goes through WeChat chat
@@ -36,7 +44,7 @@ When the bookshelf is empty, show a short illustrated guide explaining how to ge
 | 6 | Duplicates | If a book with the same title and character count already exists, ask the user to overwrite or keep both. |
 | 7 | Deleting a book | Removes the text and reading progress. **Check-in history is kept**, so streaks are not affected. |
 | 8 | Batch import | Not supported in v1: one file per import. |
-| 9 | Cover image | EPUB: keep the cover image as the bookshelf thumbnail (other images are still dropped). Find it via the manifest item with `properties="cover-image"` (EPUB 3), then `<meta name="cover">` (EPUB 2), then the first image in the cover page. Save it under `wx.env.USER_DATA_PATH`, compressed if large. TXT books, and EPUBs without a cover, get a generated placeholder cover (title on a colored background; exact style decided in the design pass). |
+| 9 | Cover image | EPUB: keep the cover image as the bookshelf thumbnail (other images are still dropped). Find it via the manifest item with `properties="cover-image"` (EPUB 3), then `<meta name="cover">` (EPUB 2), then the first image in the cover page. Save it under `wx.env.USER_DATA_PATH`, compressed if large. TXT books, and EPUBs without a cover, get a generated placeholder cover: a soft paper tone picked from the title, with the title and author set horizontally in serif type. On the bookshelf it also carries a progress ring (reading/paused), a check mark (finished), or "new". |
 
 ### 1.5 Storage
 
@@ -155,7 +163,7 @@ Global (same for all books), saved locally. Adjusted from the **Aa** panel on th
 | Font size | 4 levels |
 | Line height | 3 levels |
 | Font | 黑体 (sans-serif, default) / 宋体 (serif), system fonts only. Each option is labeled in its own typeface so the difference is visible. Mainly useful for English books: Latin serif fonts exist on both iOS (e.g. Georgia) and Android (Noto Serif), so the difference is always visible. For Chinese, some Android devices have no CJK serif font and fall back to sans-serif. |
-| Background | White / Sepia / Dark |
+| Background | Follow system (default: paper by day, dark at night) / Paper / White / Dark |
 | Dark mode | Follows the system dark mode automatically; the user can still pick manually. |
 
 Custom fonts are out of scope for v1. A full CJK font is several MB, too large for the 2 MB main package. A Latin-only font (e.g. a book serif, ~100–300 KB) could be bundled later.

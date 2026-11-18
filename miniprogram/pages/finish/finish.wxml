@@ -22,6 +22,6 @@
     <view class="message">{{message}}</view>
 
     <button class="btn-primary" bindtap="onImport">导入下一本</button>
-    <button class="secondary" bindtap="onBookshelf">去书架</button>
+    <button class="btn-secondary secondary" bindtap="onBookshelf">去书架</button>
   </view>
 </view>

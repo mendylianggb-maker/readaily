@@ -4,18 +4,21 @@ const FONT_SIZES = [30, 34, 38, 44] // rpx
 const LINE_HEIGHTS = [1.6, 1.9, 2.2]
 const FONTS = {
   sans: '-apple-system, "PingFang SC", "Helvetica Neue", Roboto, sans-serif',
-  serif: 'Georgia, "Times New Roman", "Songti SC", "Noto Serif CJK SC", serif'
+  serif: 'Georgia, "Times New Roman", "Songti SC", "STSong", "Noto Serif CJK SC", serif'
 }
+// "paper" matches the app's own background; "auto" uses paper by day and dark at night.
 const THEMES = {
-  light: { bg: '#ffffff', text: '#222222', secondary: '#999999', nav: '#ffffff', navText: '#000000' },
-  sepia: { bg: '#f4ecd8', text: '#5b4636', secondary: '#9a8670', nav: '#f4ecd8', navText: '#000000' },
-  dark: { bg: '#1c1c1e', text: '#c7c7c7', secondary: '#777777', nav: '#1c1c1e', navText: '#ffffff' }
+  paper: { bg: '#F6F1E7', text: '#2B2620', secondary: '#7A6F62', line: '#E6DDCD', accent: '#3E6B4E', nav: '#F6F1E7', navText: '#000000' },
+  light: { bg: '#FFFFFF', text: '#222222', secondary: '#8A8A8A', line: '#EEEEEE', accent: '#3E6B4E', nav: '#FFFFFF', navText: '#000000' },
+  dark: { bg: '#1E1C1A', text: '#CFC8BC', secondary: '#8A8378', line: '#3A3632', accent: '#7FA88B', nav: '#1E1C1A', navText: '#ffffff' }
 }
 
-const DEFAULTS = { fontSize: 1, lineHeight: 1, font: 'sans', theme: 'auto' }
+const DEFAULTS = { fontSize: 1, lineHeight: 1, font: 'serif', theme: 'auto' }
 
 function loadSettings() {
-  return Object.assign({}, DEFAULTS, wx.getStorageSync('settings') || {})
+  const s = Object.assign({}, DEFAULTS, wx.getStorageSync('settings') || {})
+  if (s.theme === 'sepia') s.theme = 'paper' // renamed in the design pass
+  return s
 }
 
 function saveSettings(s) {
@@ -25,22 +28,22 @@ function saveSettings(s) {
 function systemTheme() {
   try {
     const info = wx.getAppBaseInfo ? wx.getAppBaseInfo() : wx.getSystemInfoSync()
-    return info.theme === 'dark' ? 'dark' : 'light'
+    return info.theme === 'dark' ? 'dark' : 'paper'
   } catch (err) {
-    return 'light'
+    return 'paper'
   }
 }
 
 /** Resolved style values for the reader. */
 function readerStyle(s) {
   const themeName = s.theme === 'auto' ? systemTheme() : s.theme
-  const theme = THEMES[themeName] || THEMES.light
+  const theme = THEMES[themeName] || THEMES.paper
   return {
     themeName,
     theme,
     fontSize: FONT_SIZES[s.fontSize] || FONT_SIZES[1],
     lineHeight: LINE_HEIGHTS[s.lineHeight] || LINE_HEIGHTS[1],
-    fontFamily: FONTS[s.font] || FONTS.sans
+    fontFamily: FONTS[s.font] || FONTS.serif
   }
 }
 
