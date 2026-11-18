@@ -42,24 +42,19 @@
       <view class="text-secondary">{{file.name}} · {{file.sizeText}} · {{book.detail}}</view>
     </view>
 
-    <view wx:if="{{book.chapterCount}}" class="card">
-      <view class="text-secondary">目录</view>
-      <view wx:for="{{chapterTitles}}" wx:key="index" class="chapter">{{item}}</view>
-      <view wx:if="{{book.chapterCount > chapterTitles.length}}" class="text-secondary more">
-        …… 共 {{book.chapterCount}} 章
+    <view class="card">
+      <view class="card-head">
+        <text class="text-secondary">{{book.chapterCount ? '目录' : '没有识别到章节，会按段落拆分每天的阅读量。'}}</text>
+        <text wx:if="{{items.length}}" class="link" bindtap="onToggleItems">{{showItems ? '完成' : '调整内容'}}</text>
       </view>
-    </view>
-    <view wx:else class="card text-secondary">
-      没有识别到章节，会按段落拆分每天的阅读量。
-    </view>
-
-    <view wx:if="{{items.length}}" class="card">
-      <view class="skipped">
-        <text class="text-secondary skipped-text">{{skippedText || '没有跳过任何内容'}}</text>
-        <text class="link" bindtap="onToggleItems">{{showItems ? '收起' : '调整'}}</text>
-      </view>
-      <block wx:if="{{showItems}}">
-        <view class="text-secondary gap-small">勾选的内容会放进每天的阅读里。</view>
+      <block wx:if="{{!showItems}}">
+        <view wx:for="{{chapterTitles}}" wx:key="index" class="chapter">{{item}}</view>
+        <view wx:if="{{book.chapterCount > chapterTitles.length}}" class="text-secondary more">
+          …… 共 {{book.chapterCount}} 章
+        </view>
+      </block>
+      <block wx:else>
+        <view class="text-secondary gap-small">勾选的内容会放进每天的阅读。没勾选的（比如版权页、致谢）不占阅读天数，导入后可以在书架里查看。</view>
         <view
           wx:for="{{items}}"
           wx:key="index"

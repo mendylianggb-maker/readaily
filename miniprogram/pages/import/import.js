@@ -32,7 +32,6 @@ Page({
     coverPreview: '',
     // EPUB only: every item with its include state.
     items: [], // { title, extra, included }
-    skippedText: '',
     showItems: false,
     preview: '',
     error: '',
@@ -52,7 +51,7 @@ Page({
     writeCoverPreview(null)
     this.setData({
       error: '', file: null, book: null, chapterTitles: [], coverPreview: '',
-      items: [], skippedText: '', showItems: false, preview: ''
+      items: [], showItems: false, preview: ''
     })
 
     let picked
@@ -121,12 +120,6 @@ Page({
     const included = this.epub.items.filter((it, i) => this.data.items[i].included)
     const assembled = assembleBook(included)
     this.text = assembled.text
-    const skipped = this.data.items.filter((it) => !it.included)
-    this.setData({
-      skippedText: skipped.length
-        ? '已跳过 ' + skipped.length + ' 项：' + skipped.map((it) => it.title).join('、')
-        : ''
-    })
     this.showSummary(assembled, meta)
   },
 
@@ -204,7 +197,8 @@ Page({
         title,
         author,
         format: this.format,
-        cover: this.epub ? this.epub.cover : null
+        cover: this.epub ? this.epub.cover : null,
+        extras: this.epub ? this.epub.items.filter((it, i) => !this.data.items[i].included) : null
       })
     } catch (err) {
       console.error(err)

@@ -2,23 +2,33 @@ const library = require('../../utils/library')
 const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
 const checkins = require('../../utils/checkins')
-const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
-const { loadSettings, readerStyle } = require('../../utils/settings')
+const { loadSettings, saveSettings, readerStyle } = require('../../utils/settings')
 const { todayKey, shortLabel } = require('../../utils/dates')
 const { countUnits, readingMinutes } = require('../../utils/text-stats')
+const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
 
 const SAVE_SCROLL_MS = 1000
 
 Page({
   data: {
     loaded: false,
-    header: null, // { dateText, dayText, minutes, label, progress }
+    header: null, // { dateText, dayText, minutes, label, progress } or { title } for extras
     blocks: [], // { type: 'h' | 'p', text }
-    mode: 'read', // read | reread | preview
+    mode: 'read', // read | reread | extra
     finishText: '',
-    previewHint: '',
+    settings: null,
     style: null,
-    result: null // shown after finishing: { streak, newCards }
+    panel: false, // Aa settings panel
+    sizeOptions: ['小', '中', '大', '特大'],
+    lineOptions: ['紧凑', '适中', '宽松'],
+    fontOptions: [{ value: 'sans', label: '无衬线' }, { value: 'serif', label: '衬线' }],
+    themeOptions: [
+      { value: 'auto', label: '跟随系统' },
+      { value: 'light', label: '白色' },
+      { value: 'sepia', label: '护眼' },
+      { value: 'dark', label: '夜间' }
+    ],
+    result: null // shown after finishing
   },
 
   bookId: '',
@@ -29,8 +39,11 @@ Page({
 
   onLoad(options) {
     this.bookId = options.bookId
-    this.index = Number(options.index)
-    this.load()
+    if (options.extra !== undefined) this.loadExtra(Number(options.extra))
+    else {
+      this.index = Number(options.index)
+      this.load()
+    }
   },
 
   onShow() {
@@ -53,27 +66,26 @@ Page({
     this.startedAt = 0
   },
 
+  fail() {
+    wx.showToast({ title: '找不到这段内容', icon: 'none' })
+    setTimeout(() => wx.navigateBack(), 800)
+  },
+
   load() {
     const today = todayKey()
     const book = library.getBook(this.bookId)
     const plan = plans.loadPlan(this.bookId)
-    if (!book || !plan || !plan.sessions[this.index]) {
-      wx.showToast({ title: '找不到这段内容', icon: 'none' })
-      setTimeout(() => wx.navigateBack(), 800)
-      return
-    }
+    if (!book || !plan || !plan.sessions[this.index]) return this.fail()
     const session = plan.sessions[this.index]
     const text = library.readBookText(this.bookId)
     const chapters = library.getBookDetail(this.bookId).chapters
-    const mode = plans.openMode(plan, this.index, today)
     const state = plans.sessionState(session, today)
     const done = plan.sessions.filter((s) => s.done).length
-    const ahead = plans.nextAheadIndex(plan, today)
 
     wx.setNavigationBarTitle({ title: book.title })
     this.setData({
       loaded: true,
-      mode,
+      mode: plans.openMode(plan, this.index),
       header: {
         dateText: shortLabel(session.date),
         dayText: '第 ' + (this.index + 1) + ' 天',
@@ -82,10 +94,7 @@ Page({
         progress: Math.round((done / plan.sessions.length) * 100)
       },
       blocks: buildBlocks(text, chapters, session),
-      finishText: state === 'overdue' ? '完成补读' : state === 'upcoming' ? '完成提前阅读' : '完成今天的阅读',
-      previewHint: mode === 'preview' && ahead !== -1
-        ? '提前读要按顺序，下一段是 ' + shortLabel(plan.sessions[ahead].date) + ' 的'
-        : '这一段还没到时间，先看看就好'
+      finishText: state === 'overdue' ? '完成补读' : state === 'upcoming' ? '完成提前阅读' : '完成今天的阅读'
     })
 
     // Restore the scroll position if this session was left mid-way.
@@ -95,23 +104,54 @@ Page({
     }
   },
 
-  applyStyle() {
-    const style = readerStyle(loadSettings())
-    this.setData({ style })
-    wx.setNavigationBarColor({
-      frontColor: style.theme.navText,
-      backgroundColor: style.theme.nav
+  // Skipped EPUB content (cover page, index, ...): read-only, no check-in.
+  loadExtra(i) {
+    const book = library.getBook(this.bookId)
+    const detail = library.getBookDetail(this.bookId)
+    const extra = detail && detail.extras && detail.extras[i]
+    if (!book || !extra) return this.fail()
+    const text = library.readExtrasText(this.bookId).slice(extra.start, extra.end)
+    wx.setNavigationBarTitle({ title: book.title })
+    this.setData({
+      loaded: true,
+      mode: 'extra',
+      header: { title: extra.title },
+      blocks: text.split('\n').map((t) => t.trim()).filter(Boolean).map((t) => ({ type: 'p', text: t }))
     })
+  },
+
+  applyStyle() {
+    const settings = loadSettings()
+    const style = readerStyle(settings)
+    this.setData({ settings, style })
+    wx.setNavigationBarColor({ frontColor: style.theme.navText, backgroundColor: style.theme.nav })
     wx.setBackgroundColor({ backgroundColor: style.theme.bg })
   },
 
   onPageScroll(e) {
+    if (this.data.mode === 'extra') return
     const now = Date.now()
     if (now - this.lastScrollSave < SAVE_SCROLL_MS) return
     this.lastScrollSave = now
     wx.setStorageSync('progress:' + this.bookId, { index: this.index, top: e.scrollTop })
   },
 
+  // --- Aa panel ---
+  onTogglePanel() {
+    this.setData({ panel: !this.data.panel })
+  },
+
+  updateSettings(patch) {
+    saveSettings(Object.assign({}, this.data.settings, patch))
+    this.applyStyle()
+  },
+
+  onSize(e) { this.updateSettings({ fontSize: Number(e.currentTarget.dataset.value) }) },
+  onLine(e) { this.updateSettings({ lineHeight: Number(e.currentTarget.dataset.value) }) },
+  onFont(e) { this.updateSettings({ font: e.currentTarget.dataset.value }) },
+  onTheme(e) { this.updateSettings({ theme: e.currentTarget.dataset.value }) },
+
+  // --- finishing ---
   onFinish() {
     this.pauseTimer()
     const result = reading.finishSession(this.bookId, this.index, this.seconds)
@@ -158,11 +198,7 @@ Page({
     wx.navigateBack()
   },
 
-  onSettings() {
-    wx.navigateTo({ url: '/pages/settings/settings' })
-  },
-
-  // Keep the result sheet from closing when tapping inside it.
+  // Keep sheets from closing when tapping inside them.
   noop() {}
 })
 

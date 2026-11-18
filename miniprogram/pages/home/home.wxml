@@ -59,15 +59,16 @@
       </block>
     </view>
 
-    <view wx:if="{{view.showReschedule}}" class="card banner">
-      <text>落后 {{view.overdueCount}} 天了</text>
+    <view wx:if="{{view.rescheduleReason}}" class="card banner">
+      <text wx:if="{{view.rescheduleReason === 'behind'}}">落后 {{view.overdueCount}} 天了</text>
+      <text wx:else>已经提前读了 {{view.aheadCount}} 天</text>
       <text class="link" bindtap="onReschedule">重新排期</text>
     </view>
-    <view wx:elif="{{view.overdueCount > 0}}" class="card banner">
+    <view wx:if="{{view.rescheduleReason !== 'behind' && view.overdueCount > 0}}" class="card banner">
       <text>有 {{view.overdueCount}} 天待补读（从 {{view.firstOverdueLabel}} 开始）</text>
       <text class="link" bindtap="onCatchUp">去补读</text>
     </view>
-    <view wx:if="{{view.showReschedule}}" class="catchup-link text-secondary" bindtap="onCatchUp">或者继续补读 {{view.firstOverdueLabel}} 的 ›</view>
+    <view wx:if="{{view.rescheduleReason === 'behind'}}" class="catchup-link text-secondary" bindtap="onCatchUp">或者继续补读 {{view.firstOverdueLabel}} 的 ›</view>
 
     <view class="card week" bindtap="onCalendar">
       <view wx:for="{{view.week}}" wx:key="date" class="week-day">

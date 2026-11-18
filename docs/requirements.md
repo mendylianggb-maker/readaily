@@ -31,7 +31,7 @@ When the bookshelf is empty, show a short illustrated guide explaining how to ge
 | 1 | Multiple books | The bookshelf can hold multiple books, but only **one book is "currently reading"** at a time. Daily check-ins count against that book only. |
 | 2 | TXT encoding | Auto-detect UTF-8 vs GBK/GB18030. Decode GBK with a bundled decoding table (~100–200 KB). The preview on the confirmation page lets the user catch garbled text. |
 | 3 | TXT chapters | Detect chapter headings with regex (e.g. `第X章` / `第X回` / `第X卷`, `Chapter N`). If none are found, treat the book as having no chapters and split by paragraphs. No manual chapter editing in v1. |
-| 4 | EPUB scope | Text and paragraphs only, chaptered by the book's own table of contents. Images, styles, and footnote links are dropped in v1. DRM-protected files are rejected with a "protected books are not supported" message. |
+| 4 | EPUB scope | Text and paragraphs only, chaptered by the book's own table of contents. Images, styles, and footnote links are dropped in v1. DRM-protected files are rejected with a "protected books are not supported" message. Front/back matter (cover page, contents, copyright, acknowledgments, index, ...) is excluded from the schedule by default; the import page has an "Adjust content" toggle list. Excluded items are still saved and can be viewed from the bookshelf ("Extra content"), without check-ins. |
 | 5 | Size limit | Only the parsed plain text is stored; the original file is discarded. Reject files larger than **50 MB**. |
 | 6 | Duplicates | If a book with the same title and character count already exists, ask the user to overwrite or keep both. |
 | 7 | Deleting a book | Removes the text and reading progress. **Check-in history is kept**, so streaks are not affected. |
@@ -101,9 +101,11 @@ Session states:
 
 - **Reading today**: the home page shows today's session and the number of overdue sessions, e.g. "Today 11/17 · Day 23 [Start]" and "1 day to catch up (11/16) [Catch up]".
 - **Skipping**: no explicit skip action. The user simply reads today's session; earlier unread sessions stay `overdue` and can be opened from the calendar any time.
-- **Reading ahead**: allowed. The user can keep reading future sessions in order (e.g. before a holiday or trip). A session read early counts as `onTime` and is green.
-  - "In order" means: once today's session (if any) is read, the first unread future session can be read. Overdue sessions do not block reading ahead.
-- **Rescheduling**: when overdue sessions reach **7 or more**, offer a **Reschedule** button that moves all unread sessions to start from today (clears the backlog, pushes the end date out). Optional; the user can keep catching up instead.
+- **Reading ahead**: allowed, in **any order** (any future session can be opened from the calendar and finished). A session read early counts as `onTime` and is green.
+  - The home page suggests the first unread future session once today's session (if any) is read. Overdue sessions do not block reading ahead.
+- **Rescheduling**: offered when overdue sessions reach **7 or more**, or when the user has read **7 or more** sessions ahead. Optional. One Reschedule action handles both:
+  - sessions read ahead move back to the date they were actually read (still `onTime`), and their pre-credited future check-ins are removed;
+  - all unread sessions move to consecutive dates starting today (or tomorrow if today is already taken). Behind: the backlog clears and the end date moves out. Ahead: the end date moves in.
 - **Changing daily time**: re-split the unread part and reschedule it starting today. Finished sessions and check-ins are unchanged.
   - Precisely: everything up to the last read session is kept; the text after it is re-split. If that starts mid-chapter, the label shows "（续）". The setting lives on the Settings page under the current book's plan.
 
@@ -146,7 +148,7 @@ Session states:
 
 ### 3.4 Reading settings
 
-Global (same for all books), saved locally.
+Global (same for all books), saved locally. Adjusted from the **Aa** panel on the reading page and applied live. The Settings page only holds the current book's daily minutes.
 
 | Setting | Options |
 |---------|---------|
@@ -191,8 +193,7 @@ Tapping a date opens that date's reading page **directly** (no intermediate popu
 |-------|-----------|
 | `overdue` | Reading page (catch-up) |
 | `onTime` / `late` | Reading page for re-reading; status does not change, Finish button is replaced by "Done" |
-| `upcoming`, next unread session | Reading page (read ahead) |
-| `upcoming`, not next | Reading page in **preview** mode (the user may just want a peek). No Finish button; the bottom shows "Read ahead in order: next is MM/DD". |
+| `upcoming` | Reading page (read ahead, any order) |
 | Blank | Nothing |
 
 ### 4.4 Where other actions live
@@ -217,5 +218,5 @@ The home page shows a Mon–Sun row with this week's marks, so the user sees pro
   - 读完一整本书了！今天奖励一下自己吧，去喝杯喜欢的饮料。
   - 坚持了 N 天，这本书是你的了。给自己放个不看手机的下午吧。
   - 又读完一本。挑个小礼物送给认真读书的自己。
-- The book moves to "Finished" on the bookshelf.
+- The book moves to "Finished" on the bookshelf. A finished book can be **read again**: a fresh plan from day 1 (check-in history is kept). Low priority.
 - Prompt to import or pick the next book (optional, not forced).

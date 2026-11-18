@@ -5,6 +5,7 @@
 //   storage "book:<id>"    -> { chapters } (per book, can be large)
 //   file    books/<id>/text.txt -> full decoded text (UTF-8)
 //   file    books/<id>/cover.<ext> -> cover image (EPUB only, optional)
+//   file    books/<id>/extras.txt -> skipped EPUB items (cover page, index, ...), viewable, not scheduled
 
 const BOOKS_KEY = 'books'
 const detailKey = (id) => 'book:' + id
@@ -49,7 +50,7 @@ function findDuplicate(title, stats) {
  * Save a parsed book. Throws on failure (e.g. storage full) after cleaning up.
  * @returns {object} the new BookMeta
  */
-function addBook({ text, parsed, title, author, format, cover }) {
+function addBook({ text, parsed, title, author, format, cover, extras }) {
   const fs = wx.getFileSystemManager()
   const id = newId()
   const meta = {
@@ -61,6 +62,7 @@ function addBook({ text, parsed, title, author, format, cover }) {
     stats: parsed.stats,
     chapterCount: parsed.hasChapters ? parsed.chapters.length : 0,
     coverPath: '',
+    extraCount: extras ? extras.length : 0,
     status: 'new', // new | reading | paused | finished
     importedAt: Date.now()
   }
@@ -74,7 +76,16 @@ function addBook({ text, parsed, title, author, format, cover }) {
       meta.coverPath = bookDir(id) + '/cover.' + cover.ext
       fs.writeFileSync(meta.coverPath, data)
     }
-    wx.setStorageSync(detailKey(id), { chapters: parsed.chapters })
+    const detail = { chapters: parsed.chapters, extras: [] }
+    if (extras && extras.length) {
+      let all = ''
+      extras.forEach((x) => {
+        detail.extras.push({ title: x.title, start: all.length, end: all.length + x.text.length })
+        all += x.text
+      })
+      fs.writeFileSync(bookDir(id) + '/extras.txt', all, 'utf8')
+    }
+    wx.setStorageSync(detailKey(id), detail)
     saveBookList(listBooks().concat(meta))
   } catch (err) {
     removeBookFiles(id)
@@ -130,6 +141,10 @@ function readBookText(id) {
   return wx.getFileSystemManager().readFileSync(textPath(id), 'utf8')
 }
 
+function readExtrasText(id) {
+  return wx.getFileSystemManager().readFileSync(bookDir(id) + '/extras.txt', 'utf8')
+}
+
 function getBookDetail(id) {
   return wx.getStorageSync(detailKey(id)) || null
 }
@@ -144,5 +159,6 @@ module.exports = {
   addBook,
   deleteBook,
   readBookText,
+  readExtrasText,
   getBookDetail
 }

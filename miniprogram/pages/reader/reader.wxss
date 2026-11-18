@@ -76,11 +76,11 @@
 
 .sheet {
   width: 100%;
+  box-sizing: border-box;
   background: #ffffff;
   color: #222222;
   border-radius: 32rpx 32rpx 0 0;
   padding: 48rpx 48rpx 64rpx;
-  text-align: center;
   font-family: -apple-system, "PingFang SC", sans-serif;
   line-height: 1.6;
 }
@@ -106,4 +106,40 @@
 
 .sheet-btn {
   margin-top: 20rpx;
+}
+
+.result {
+  text-align: center;
+}
+
+.panel .row {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+}
+
+.row-title {
+  width: 100rpx;
+  flex-shrink: 0;
+  font-size: 28rpx;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.opt {
+  padding: 8rpx 20rpx;
+  margin: 6rpx 12rpx 6rpx 0;
+  border: 1rpx solid #dddddd;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+}
+
+.opt.on {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #ffffff;
 }

@@ -1,7 +1,7 @@
 const reading = require('../../utils/reading')
 const checkins = require('../../utils/checkins')
 const { placeholderColor } = require('../../utils/cover')
-const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
+const { BOOKMARK_EXPLAINER, confirmReschedule } = require('../../utils/ui')
 
 Page({
   data: {
@@ -42,17 +42,10 @@ Page({
     this.openSession(this.data.view.firstOverdue)
   },
 
-  onReschedule() {
-    wx.showModal({
-      title: '重新排期',
-      content: '把还没读的内容从今天开始重新排，待补读清零，读完的日子会往后推。',
-      confirmText: '重新排期',
-      success: (res) => {
-        if (!res.confirm) return
-        reading.rescheduleBook(this.data.view.book.id)
-        this.onShow()
-      }
-    })
+  async onReschedule() {
+    if (!(await confirmReschedule(this.data.view.rescheduleReason))) return
+    reading.rescheduleBook(this.data.view.book.id)
+    this.onShow()
   },
 
   onImport() {

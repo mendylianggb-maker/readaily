@@ -1,0 +1,10 @@
+.intro {
+  margin-bottom: 24rpx;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}

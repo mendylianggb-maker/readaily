@@ -53,13 +53,10 @@
   border-radius: 8rpx;
 }
 
-.skipped {
+.card-head {
   display: flex;
+  justify-content: space-between;
   align-items: flex-start;
-}
-
-.skipped-text {
-  flex: 1;
 }
 
 .link {

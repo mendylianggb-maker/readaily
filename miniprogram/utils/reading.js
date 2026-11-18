@@ -18,6 +18,7 @@ function startBook(bookId, dailyMinutes) {
   let plan = plans.loadPlan(bookId)
   if (plan) {
     plans.reschedule(plan, today)
+    checkins.removeFutureCheckins(today)
   } else {
     const detail = library.getBookDetail(bookId)
     plan = plans.createPlan(library.readBookText(bookId), detail.chapters, dailyMinutes, today)
@@ -53,9 +54,27 @@ function finishSession(bookId, index, seconds) {
 }
 
 function rescheduleBook(bookId) {
+  const today = todayKey()
   const plan = plans.loadPlan(bookId)
-  plans.reschedule(plan, todayKey())
+  plans.reschedule(plan, today)
   plans.savePlan(bookId, plan)
+  checkins.removeFutureCheckins(today)
+}
+
+/** Read a finished book again: a fresh plan from today. Check-ins are kept. */
+function restartBook(bookId, dailyMinutes) {
+  plans.removePlan(bookId)
+  wx.removeStorageSync('progress:' + bookId)
+  return startBook(bookId, dailyMinutes)
+}
+
+const RESCHEDULE_AT = 7
+
+/** Whether to offer Reschedule, and why: 'behind' | 'ahead' | ''. */
+function rescheduleReason(plan, today) {
+  if (plans.overdueIndexes(plan, today).length >= RESCHEDULE_AT) return 'behind'
+  if (plans.aheadCount(plan, today) >= RESCHEDULE_AT) return 'ahead'
+  return ''
 }
 
 function changeDailyMinutes(bookId, minutes) {
@@ -132,7 +151,8 @@ function homeView() {
     overdueCount: overdue.length,
     firstOverdue: overdue.length ? overdue[0] : -1,
     firstOverdueLabel: overdue.length ? shortLabel(plan.sessions[overdue[0]].date) : '',
-    showReschedule: overdue.length >= 7,
+    rescheduleReason: rescheduleReason(plan, today),
+    aheadCount: plans.aheadCount(plan, today),
     aheadIndex: ahead,
     aheadLabel: ahead === -1 ? '' : shortLabel(plan.sessions[ahead].date),
     week
@@ -140,5 +160,6 @@ function homeView() {
 }
 
 module.exports = {
-  startBook, finishSession, rescheduleBook, changeDailyMinutes, bookmarkSession, dateMap, homeView
+  startBook, restartBook, finishSession, rescheduleBook, rescheduleReason, changeDailyMinutes,
+  bookmarkSession, dateMap, homeView
 }

@@ -45,7 +45,14 @@ Page({
     const actions = []
     if (book.status === 'reading') actions.push({ text: '继续阅读', run: () => wx.switchTab({ url: '/pages/home/home' }) })
     else if (book.status === 'paused') actions.push({ text: '继续读这本', run: () => this.start(id) })
-    else if (book.status !== 'finished') actions.push({ text: '开始读这本', run: () => this.start(id) })
+    else if (book.status === 'finished') actions.push({ text: '再读一遍', run: () => this.restart(id) })
+    else actions.push({ text: '开始读这本', run: () => this.start(id) })
+    if (book.extraCount) {
+      actions.push({
+        text: '查看附加内容（' + book.extraCount + '）',
+        run: () => wx.navigateTo({ url: '/pages/extras/extras?bookId=' + id })
+      })
+    }
     actions.push({ text: '删除', run: () => this.confirmDelete(id, title) })
     wx.showActionSheet({
       itemList: actions.map((a) => a.text),
@@ -65,6 +72,18 @@ Page({
       if (!minutes) return
     }
     reading.startBook(id, minutes)
+    wx.switchTab({ url: '/pages/home/home' })
+  },
+
+  async restart(id) {
+    const current = library.getCurrentBookId()
+    const content = current
+      ? '会从第 1 天重新排计划，《' + library.getBook(current).title + '》会暂停。打卡记录都会保留。'
+      : '会从第 1 天重新排计划，打卡记录会保留。'
+    if (!(await confirm('再读一遍？', content, '再读一遍'))) return
+    const minutes = await chooseDailyMinutes()
+    if (!minutes) return
+    reading.restartBook(id, minutes)
     wx.switchTab({ url: '/pages/home/home' })
   },
 

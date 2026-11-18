@@ -32,6 +32,13 @@ function recordCheckin(today, sessionDate) {
   wx.setStorageSync('checkins', c)
 }
 
+/** Drop pre-credits for future dates (used when a schedule is reset). */
+function removeFutureCheckins(today) {
+  const c = loadCheckins()
+  Object.keys(c).forEach((d) => { if (d > today) delete c[d] })
+  wx.setStorageSync('checkins', c)
+}
+
 /** Current streak and the date it started. Today not read yet does not break it. */
 function streakInfo(today, checkins) {
   const c = checkins || loadCheckins()
@@ -94,6 +101,6 @@ function markExplained() {
 
 module.exports = {
   STREAK_FOR_CARD, MAX_CARDS,
-  loadCheckins, loadRewards, recordCheckin, streakInfo, totalDays,
+  loadCheckins, loadRewards, recordCheckin, removeFutureCheckins, streakInfo, totalDays,
   updateRewards, cardProgress, useCard, markExplained
 }

@@ -63,8 +63,9 @@ function overdueIndexes(plan, today) {
 }
 
 /**
- * The session that may be read ahead: the first unread future session,
- * once today's session (if any) is done.
+ * The session suggested for reading ahead on the home page: the first unread
+ * future session, once today's session (if any) is done. Any future session
+ * can still be opened from the calendar.
  */
 function nextAheadIndex(plan, today) {
   const t = todayIndex(plan, today)
@@ -72,12 +73,14 @@ function nextAheadIndex(plan, today) {
   return plan.sessions.findIndex((s) => !s.done && s.date > today)
 }
 
-/** How a session may be opened: read | reread | preview. */
-function openMode(plan, index, today) {
-  const s = plan.sessions[index]
-  if (s.done) return 'reread'
-  if (s.date <= today) return 'read'
-  return index === nextAheadIndex(plan, today) ? 'read' : 'preview'
+/** How a session may be opened: read | reread. Reading ahead is allowed in any order. */
+function openMode(plan, index) {
+  return plan.sessions[index].done ? 'reread' : 'read'
+}
+
+/** Number of sessions already read whose date is still in the future. */
+function aheadCount(plan, today) {
+  return plan.sessions.filter((s) => s.done && s.date > today).length
 }
 
 function isFinished(plan) {
@@ -85,10 +88,16 @@ function isFinished(plan) {
 }
 
 /**
- * Move every unread session to consecutive dates from today, skipping dates
- * already taken by read sessions. Used by Reschedule and when resuming a book.
+ * Reset the schedule around today:
+ * - sessions read ahead move back to the day they were actually read;
+ * - every unread session moves to consecutive dates from today, skipping
+ *   dates already taken by read sessions.
+ * Fixes both falling behind and reading far ahead. Also used when resuming a book.
  */
 function reschedule(plan, today) {
+  plan.sessions.forEach((s) => {
+    if (s.done && s.date > today) s.date = s.done
+  })
   const taken = new Set(plan.sessions.filter((s) => s.done).map((s) => s.date))
   let date = today
   plan.sessions.forEach((s) => {
@@ -117,6 +126,6 @@ function changeDailyMinutes(plan, text, chapters, minutes, today) {
 
 module.exports = {
   loadPlan, savePlan, removePlan, createPlan,
-  sessionState, todayIndex, overdueIndexes, nextAheadIndex, openMode, isFinished,
+  sessionState, todayIndex, overdueIndexes, nextAheadIndex, openMode, aheadCount, isFinished,
   reschedule, changeDailyMinutes
 }

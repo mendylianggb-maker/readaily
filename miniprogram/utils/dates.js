@@ -11,8 +11,36 @@ function fromKey(key) {
   return new Date(y, m - 1, d)
 }
 
+// Simulated date for development: a day offset stored locally, only honored
+// in the develop/trial versions, never in the released mini program.
+const DAY_OFFSET_KEY = 'debug:dayOffset'
+
+function isDevBuild() {
+  try {
+    const v = wx.getAccountInfoSync().miniProgram.envVersion
+    return v === 'develop' || v === 'trial'
+  } catch (err) {
+    return false
+  }
+}
+
+function getDayOffset() {
+  if (!isDevBuild()) return 0
+  try {
+    return Number(wx.getStorageSync(DAY_OFFSET_KEY)) || 0
+  } catch (err) {
+    return 0
+  }
+}
+
+function setDayOffset(n) {
+  wx.setStorageSync(DAY_OFFSET_KEY, n)
+}
+
 function todayKey() {
-  return toKey(new Date())
+  const key = toKey(new Date())
+  const offset = getDayOffset()
+  return offset ? addDays(key, offset) : key
 }
 
 function addDays(key, n) {
@@ -40,4 +68,7 @@ function weekStart(key) {
   return toKey(d)
 }
 
-module.exports = { toKey, fromKey, todayKey, addDays, diffDays, shortLabel, weekStart }
+module.exports = {
+  toKey, fromKey, todayKey, addDays, diffDays, shortLabel, weekStart,
+  isDevBuild, getDayOffset, setDayOffset
+}

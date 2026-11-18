@@ -1,47 +1,24 @@
-const { loadSettings, saveSettings, readerStyle } = require('../../utils/settings')
 const library = require('../../utils/library')
 const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
+const { todayKey, shortLabel, isDevBuild, getDayOffset, setDayOffset } = require('../../utils/dates')
 const { MINUTE_OPTIONS, confirm } = require('../../utils/ui')
 
 Page({
   data: {
-    settings: null,
-    style: null,
-    sizeOptions: ['小', '中', '大', '特大'],
-    lineOptions: ['紧凑', '适中', '宽松'],
-    fontOptions: [{ value: 'sans', label: '无衬线' }, { value: 'serif', label: '衬线' }],
-    themeOptions: [
-      { value: 'auto', label: '跟随系统' },
-      { value: 'light', label: '白色' },
-      { value: 'sepia', label: '护眼' },
-      { value: 'dark', label: '夜间' }
-    ],
     minuteOptions: MINUTE_OPTIONS,
-    plan: null // { title, dailyMinutes }
+    plan: null, // { title, dailyMinutes }
+    dev: null // { todayLabel, offset } in develop/trial builds only
   },
 
   onShow() {
-    const settings = loadSettings()
     const bookId = library.getCurrentBookId()
     const plan = bookId ? plans.loadPlan(bookId) : null
     this.setData({
-      settings,
-      style: readerStyle(settings),
-      plan: plan ? { title: library.getBook(bookId).title, dailyMinutes: plan.dailyMinutes } : null
+      plan: plan ? { title: library.getBook(bookId).title, dailyMinutes: plan.dailyMinutes } : null,
+      dev: isDevBuild() ? { todayLabel: shortLabel(todayKey()), offset: getDayOffset() } : null
     })
   },
-
-  update(patch) {
-    const settings = Object.assign({}, this.data.settings, patch)
-    saveSettings(settings)
-    this.setData({ settings, style: readerStyle(settings) })
-  },
-
-  onSize(e) { this.update({ fontSize: Number(e.currentTarget.dataset.value) }) },
-  onLine(e) { this.update({ lineHeight: Number(e.currentTarget.dataset.value) }) },
-  onFont(e) { this.update({ font: e.currentTarget.dataset.value }) },
-  onTheme(e) { this.update({ theme: e.currentTarget.dataset.value }) },
 
   async onMinutes(e) {
     const minutes = Number(e.currentTarget.dataset.value)
@@ -57,5 +34,16 @@ Page({
     wx.hideLoading()
     this.setData({ 'plan.dailyMinutes': minutes })
     wx.showToast({ title: '已修改', icon: 'success' })
-  }
+  },
+
+  // --- Simulated date (develop/trial builds only) ---
+  shiftDays(n) {
+    setDayOffset(n === 0 ? 0 : getDayOffset() + n)
+    this.onShow()
+  },
+
+  onPrevDay() { this.shiftDays(-1) },
+  onNextDay() { this.shiftDays(1) },
+  onNextWeek() { this.shiftDays(7) },
+  onResetDay() { this.shiftDays(0) }
 })

@@ -31,4 +31,13 @@ const BOOKMARK_EXPLAINER =
   '它可以把日历上一个黄色的「补读」日变成绿色的「按时完成」，就像把书签插回那一天。\n\n' +
   '使用方法：在日历页点顶部的书签数量，再点一个黄色的日子。'
 
-module.exports = { MINUTE_OPTIONS, chooseDailyMinutes, confirm, BOOKMARK_EXPLAINER }
+const RESCHEDULE_TEXT = {
+  behind: '把还没读的内容从今天开始重新排，待补读清零，读完的日子会往后推。',
+  ahead: '把提前读过的日子挪回你实际读的那天，后面的内容从今天（或明天）起重新排，读完的日子会提前。'
+}
+
+function confirmReschedule(reason) {
+  return confirm('重新排期', RESCHEDULE_TEXT[reason] || RESCHEDULE_TEXT.behind, '重新排期')
+}
+
+module.exports = { MINUTE_OPTIONS, chooseDailyMinutes, confirm, confirmReschedule, BOOKMARK_EXPLAINER }

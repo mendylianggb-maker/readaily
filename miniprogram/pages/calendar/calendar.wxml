@@ -18,8 +18,9 @@
     《{{stats.title}}》已读 {{stats.progress}}% · 预计 {{stats.endLabel}} 读完
   </view>
 
-  <view wx:if="{{stats.showReschedule}}" class="card banner">
-    <text>落后 {{stats.overdue}} 天了</text>
+  <view wx:if="{{stats.rescheduleReason}}" class="card banner">
+    <text wx:if="{{stats.rescheduleReason === 'behind'}}">落后 {{stats.overdue}} 天了</text>
+    <text wx:else>已经提前读了 {{stats.ahead}} 天</text>
     <text class="link" bindtap="onReschedule">重新排期</text>
   </view>
 

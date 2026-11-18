@@ -2,8 +2,8 @@ const library = require('../../utils/library')
 const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
 const checkins = require('../../utils/checkins')
-const { todayKey, toKey, shortLabel } = require('../../utils/dates')
-const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
+const { todayKey, toKey, fromKey, shortLabel } = require('../../utils/dates')
+const { BOOKMARK_EXPLAINER, confirmReschedule } = require('../../utils/ui')
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日']
 
@@ -20,7 +20,7 @@ Page({
 
   onShow() {
     if (!this.data.year) {
-      const now = new Date()
+      const now = fromKey(todayKey())
       this.setData({ year: now.getFullYear(), month: now.getMonth() + 1 })
     }
     this.render()
@@ -67,7 +67,8 @@ Page({
         progress: Math.round((done / plan.sessions.length) * 100),
         endLabel: shortLabel(plan.sessions.reduce((a, s) => (s.date > a ? s.date : a), today)),
         overdue,
-        showReschedule: overdue >= 7
+        ahead: plans.aheadCount(plan, today),
+        rescheduleReason: reading.rescheduleReason(plan, today)
       })
     }
     this.setData({ cells, stats, hasBook: !!plan })
@@ -126,16 +127,9 @@ Page({
     this.setData({ bookmarkMode: false })
   },
 
-  onReschedule() {
-    wx.showModal({
-      title: '重新排期',
-      content: '把还没读的内容从今天开始重新排，待补读清零，读完的日子会往后推。',
-      confirmText: '重新排期',
-      success: (res) => {
-        if (!res.confirm) return
-        reading.rescheduleBook(library.getCurrentBookId())
-        this.render()
-      }
-    })
+  async onReschedule() {
+    if (!(await confirmReschedule(this.data.stats.rescheduleReason))) return
+    reading.rescheduleBook(library.getCurrentBookId())
+    this.render()
   }
 })

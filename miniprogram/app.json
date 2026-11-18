@@ -6,7 +6,8 @@
     "pages/import/import",
     "pages/reader/reader",
     "pages/settings/settings",
-    "pages/finish/finish"
+    "pages/finish/finish",
+    "pages/extras/extras"
   ],
   "window": {
     "navigationBarTitleText": "Readaily",

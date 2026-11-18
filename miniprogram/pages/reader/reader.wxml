@@ -5,14 +5,18 @@
 >
   <view class="header" style="color: {{style.theme.secondary}}">
     <view class="header-row">
-      <text>{{header.dateText}} · {{header.dayText}} · 约 {{header.minutes}} 分钟</text>
-      <text class="aa" bindtap="onSettings">Aa</text>
+      <text wx:if="{{mode === 'extra'}}">附加内容（不计入阅读天数）</text>
+      <text wx:else>{{header.dateText}} · {{header.dayText}} · 约 {{header.minutes}} 分钟</text>
+      <text class="aa" bindtap="onTogglePanel">Aa</text>
     </view>
-    <view wx:if="{{header.label}}" class="header-label">{{header.label}}</view>
-    <view class="progress"><view class="progress-bar" style="width: {{header.progress}}%"></view></view>
+    <block wx:if="{{mode !== 'extra'}}">
+      <view wx:if="{{header.label}}" class="header-label">{{header.label}}</view>
+      <view class="progress"><view class="progress-bar" style="width: {{header.progress}}%"></view></view>
+    </block>
   </view>
 
   <view class="body">
+    <view wx:if="{{mode === 'extra'}}" class="chapter-title">{{header.title}}</view>
     <block wx:for="{{blocks}}" wx:key="index">
       <view wx:if="{{item.type === 'h'}}" class="chapter-title">{{item.text}}</view>
       <text wx:else class="para" user-select>{{item.text}}</text>
@@ -22,13 +26,42 @@
   <view class="footer">
     <button wx:if="{{mode === 'read'}}" class="btn-primary" bindtap="onFinish">{{finishText}}</button>
     <view wx:elif="{{mode === 'reread'}}" class="footer-note">已读完 ✓</view>
-    <view wx:else class="footer-note">{{previewHint}}</view>
+  </view>
+</view>
+
+<!-- Aa: reading settings, applied live -->
+<view wx:if="{{panel}}" class="mask" bindtap="onTogglePanel">
+  <view class="sheet panel" catchtap="noop">
+    <view class="row">
+      <text class="row-title">字号</text>
+      <view class="options">
+        <text wx:for="{{sizeOptions}}" wx:key="index" class="opt {{settings.fontSize === index ? 'on' : ''}}" data-value="{{index}}" bindtap="onSize">{{item}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">行距</text>
+      <view class="options">
+        <text wx:for="{{lineOptions}}" wx:key="index" class="opt {{settings.lineHeight === index ? 'on' : ''}}" data-value="{{index}}" bindtap="onLine">{{item}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">字体</text>
+      <view class="options">
+        <text wx:for="{{fontOptions}}" wx:key="value" class="opt {{settings.font === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onFont">{{item.label}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">背景</text>
+      <view class="options">
+        <text wx:for="{{themeOptions}}" wx:key="value" class="opt {{settings.theme === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onTheme">{{item.label}}</text>
+      </view>
+    </view>
   </view>
 </view>
 
 <!-- Shown after finishing a session -->
 <view wx:if="{{result}}" class="mask" bindtap="onBack">
-  <view class="sheet" catchtap="noop">
+  <view class="sheet result" catchtap="noop">
     <view class="sheet-icon">🎉</view>
     <view class="sheet-title">打卡成功</view>
     <view class="sheet-streak">已连续 {{result.streak}} 天</view>
