@@ -42,3 +42,8 @@
 .dev-today {
   margin-bottom: 12rpx;
 }
+
+.dev-note {
+  font-size: 24rpx;
+  margin: 16rpx 0 12rpx;
+}

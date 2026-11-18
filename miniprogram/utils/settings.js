@@ -44,4 +44,4 @@ function readerStyle(s) {
   }
 }
 
-module.exports = { FONT_SIZES, LINE_HEIGHTS, loadSettings, saveSettings, readerStyle }
+module.exports = { FONTS, FONT_SIZES, LINE_HEIGHTS, loadSettings, saveSettings, readerStyle }

@@ -77,10 +77,9 @@ Page({
 
   async restart(id) {
     const current = library.getCurrentBookId()
-    const content = current
-      ? '会从第 1 天重新排计划，《' + library.getBook(current).title + '》会暂停。打卡记录都会保留。'
-      : '会从第 1 天重新排计划，打卡记录会保留。'
-    if (!(await confirm('再读一遍？', content, '再读一遍'))) return
+    let content = '会从第 1 天重新排计划。这本书上一轮的阅读记录（日历上的每日标记、按时率等）会被清空，不能恢复。\n\n连续打卡和累计天数不受影响。'
+    if (current) content += '\n\n正在读的《' + library.getBook(current).title + '》会暂停。'
+    if (!(await confirm('再读一遍？', content, '清空并重读'))) return
     const minutes = await chooseDailyMinutes()
     if (!minutes) return
     reading.restartBook(id, minutes)

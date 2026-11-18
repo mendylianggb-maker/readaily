@@ -118,8 +118,8 @@ Session states:
 ### 2.5 Streaks and rewards
 
 - **Streak (lenient)**: a calendar day counts if the user finished at least one session that day (on time, catch-up, or reading ahead). A day whose session was already read early also counts when that date arrives, so reading ahead before a trip keeps the streak alive.
-- **Reward card — "Time Bookmark"** (UI name: 时光书签): every **14 consecutive streak days** earns one card. A card turns one `late` (yellow) session into `onTime` (green). It cannot be used on `overdue` (unread) sessions.
-  - Cards can be saved, up to **3**. While holding 3, completing another 14-day run earns nothing.
+- **Reward card — "Time Bookmark"** (UI name: 时光书签): every **7 consecutive streak days** earns one card. A card turns one `late` (yellow) session into `onTime` (green). It cannot be used on `overdue` (unread) sessions.
+  - Cards can be saved, up to **3**. While holding 3, completing another 7-day run earns nothing.
   - No anti-cheating: reading many days ahead and letting the streak grow is acceptable. This is a self-motivation tool.
 
 ## 3. Daily reading page
@@ -141,7 +141,7 @@ Session states:
 |---|-------|----------|
 | 1 | Paging | Vertical scrolling. Horizontal page turning is out of scope for v1. |
 | 2 | Completion | The session counts as read only when the user taps **Finish** at the end (no auto check-in). No minimum reading time. |
-| 3 | After finishing | Show a check-in animation and the current streak; show an extra notice when a Time Bookmark card is earned. Then offer **Read next day** (read ahead) and **Catch up** (only if there are overdue sessions). |
+| 3 | After finishing | Show a check-in animation and the current streak; show an extra notice when a Time Bookmark card is earned. Then offer **Read today's** (if today's session is still unread, e.g. after a catch-up), **Continue catching up** (only if there are overdue sessions), and **Read next day** (read ahead, once today is done). |
 | 4 | Leaving mid-session | Remember the scroll position within the session and restore it next time. |
 | 5 | Keep screen on | `wx.setKeepScreenOn` while reading. |
 | 6 | Reading time | Record actual time spent per session silently (not shown); used later to calibrate reading speed. |
@@ -154,7 +154,7 @@ Global (same for all books), saved locally. Adjusted from the **Aa** panel on th
 |---------|---------|
 | Font size | 4 levels |
 | Line height | 3 levels |
-| Font | Sans-serif (default) / Serif, system fonts only. Mainly useful for English books: Latin serif fonts exist on both iOS (e.g. Georgia) and Android (Noto Serif), so the difference is always visible. For Chinese, some Android devices have no CJK serif font and fall back to sans-serif. |
+| Font | 黑体 (sans-serif, default) / 宋体 (serif), system fonts only. Each option is labeled in its own typeface so the difference is visible. Mainly useful for English books: Latin serif fonts exist on both iOS (e.g. Georgia) and Android (Noto Serif), so the difference is always visible. For Chinese, some Android devices have no CJK serif font and fall back to sans-serif. |
 | Background | White / Sepia / Dark |
 | Dark mode | Follows the system dark mode automatically; the user can still pick manually. |
 
@@ -201,14 +201,14 @@ Tapping a date opens that date's reading page **directly** (no intermediate popu
 - **Reschedule**: when overdue sessions ≥ 7, a banner appears at the top of the calendar (and on the home page): "9 days behind · [Reschedule]".
 - **Use a Time Bookmark**: tap the bookmark counter in the stats header to enter selection mode. Yellow dates are highlighted; tapping one converts it to green and uses a card. Tap again or Cancel to exit.
 - **Explaining the Time Bookmark**: users must understand what the card does.
-  - When the first card is earned, show a short explainer: what it is, how it was earned (14-day streak), what it does (turns one yellow catch-up day green), and how to use it.
+  - When the first card is earned, show a short explainer: what it is, how it was earned (7-day streak), what it does (turns one yellow catch-up day green), and how to use it.
   - A "?" icon next to the counter in the stats header reopens the explainer.
   - Selection mode shows a hint bar: "Pick a yellow day to mark it as on time".
-  - With 0 cards, tapping the counter shows the explainer plus progress toward the next card (e.g. "9 / 14 days").
+  - With 0 cards, tapping the counter shows the explainer plus progress toward the next card (e.g. "4 / 7 days").
 
 ### 4.5 Home page week strip
 
-The home page shows a Mon–Sun row with this week's marks, so the user sees progress without opening the calendar.
+The home page shows a Mon–Sun row with this week's marks, so the user sees progress without opening the calendar. Tapping a day opens that day's session in the reader, like the calendar; a separate link opens the full calendar.
 
 ### 4.6 Finishing a book
 
@@ -218,5 +218,5 @@ The home page shows a Mon–Sun row with this week's marks, so the user sees pro
   - 读完一整本书了！今天奖励一下自己吧，去喝杯喜欢的饮料。
   - 坚持了 N 天，这本书是你的了。给自己放个不看手机的下午吧。
   - 又读完一本。挑个小礼物送给认真读书的自己。
-- The book moves to "Finished" on the bookshelf. A finished book can be **read again**: a fresh plan from day 1 (check-in history is kept). Low priority.
+- The book moves to "Finished" on the bookshelf. A finished book can be **read again**: a fresh plan from day 1. A confirmation warns that the previous round's records for this book (daily marks, on-time rate) are cleared and cannot be restored; global streak and total days are kept. Low priority.
 - Prompt to import or pick the next book (optional, not forced).

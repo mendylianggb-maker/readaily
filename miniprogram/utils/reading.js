@@ -133,7 +133,7 @@ function homeView() {
   const week = WEEKDAYS.map((name, i) => {
     const date = addDays(monday, i)
     const m = map[date]
-    return { name, date, day: Number(date.slice(8)), state: m ? m.state : 'none', isToday: date === today }
+    return { name, date, day: Number(date.slice(8)), index: m ? m.index : -1, state: m ? m.state : 'none', isToday: date === today }
   })
   const done = plan.sessions.filter((s) => s.done).length
 

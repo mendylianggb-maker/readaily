@@ -6,7 +6,7 @@
 
 const { addDays } = require('./dates')
 
-const STREAK_FOR_CARD = 14
+const STREAK_FOR_CARD = 7
 const MAX_CARDS = 3
 
 function loadCheckins() {
@@ -58,7 +58,7 @@ function totalDays(today, checkins) {
   return Object.keys(c).filter((d) => d <= today).length
 }
 
-/** Award cards for every 14 streak days in the current run. Returns the number of new cards. */
+/** Award cards for every STREAK_FOR_CARD streak days in the current run. Returns the number of new cards. */
 function updateRewards(today) {
   const { length, start } = streakInfo(today)
   const r = loadRewards()
@@ -80,7 +80,7 @@ function updateRewards(today) {
   return added
 }
 
-/** Days into the current run toward the next card, e.g. 9 (of 14). */
+/** Days into the current run toward the next card, e.g. 4 (of 7). */
 function cardProgress(today) {
   return streakInfo(today).length % STREAK_FOR_CARD
 }

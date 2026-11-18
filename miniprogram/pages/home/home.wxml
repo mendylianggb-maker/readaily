@@ -70,10 +70,16 @@
     </view>
     <view wx:if="{{view.rescheduleReason === 'behind'}}" class="catchup-link text-secondary" bindtap="onCatchUp">或者继续补读 {{view.firstOverdueLabel}} 的 ›</view>
 
-    <view class="card week" bindtap="onCalendar">
-      <view wx:for="{{view.week}}" wx:key="date" class="week-day">
+    <view class="card">
+      <view class="week-head">
+        <text class="text-secondary">本周</text>
+        <text class="link" bindtap="onCalendar">完整日历 ›</text>
+      </view>
+      <view class="week">
+      <view wx:for="{{view.week}}" wx:key="date" class="week-day" data-index="{{item.index}}" bindtap="onWeekDay">
         <view class="text-secondary">{{item.name}}</view>
         <view class="dot state-{{item.state}} {{item.isToday ? 'is-today' : ''}}">{{item.day}}</view>
+      </view>
       </view>
     </view>
   </block>

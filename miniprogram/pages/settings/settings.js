@@ -45,5 +45,18 @@ Page({
   onPrevDay() { this.shiftDays(-1) },
   onNextDay() { this.shiftDays(1) },
   onNextWeek() { this.shiftDays(7) },
-  onResetDay() { this.shiftDays(0) }
+  onResetDay() { this.shiftDays(0) },
+
+  async onClearAll() {
+    const ok = await confirm('清空所有数据？', '书、阅读计划、打卡记录、时光书签和设置都会删掉，模拟日期回到今天。', '清空')
+    if (!ok) return
+    wx.clearStorageSync()
+    try {
+      wx.getFileSystemManager().rmdirSync(wx.env.USER_DATA_PATH + '/books', true)
+    } catch (err) {
+      // Nothing imported yet.
+    }
+    wx.showToast({ title: '已清空', icon: 'success' })
+    this.onShow()
+  }
 })

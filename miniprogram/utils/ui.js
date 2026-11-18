@@ -1,5 +1,7 @@
 // Shared UI helpers.
 
+const { STREAK_FOR_CARD, MAX_CARDS } = require('./checkins')
+
 const MINUTE_OPTIONS = [5, 10, 15, 20]
 
 /** Ask for daily reading minutes. Resolves to a number, or null if cancelled. */
@@ -27,7 +29,7 @@ function confirm(title, content, confirmText) {
 }
 
 const BOOKMARK_EXPLAINER =
-  '连续打卡 14 天，就能得到一张时光书签，最多存 3 张。\n\n' +
+  '连续打卡 ' + STREAK_FOR_CARD + ' 天，就能得到一张时光书签，最多存 ' + MAX_CARDS + ' 张。\n\n' +
   '它可以把日历上一个黄色的「补读」日变成绿色的「按时完成」，就像把书签插回那一天。\n\n' +
   '使用方法：在日历页点顶部的书签数量，再点一个黄色的日子。'
 

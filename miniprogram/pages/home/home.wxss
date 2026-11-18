@@ -117,6 +117,12 @@
   text-align: right;
 }
 
+.week-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
 .week {
   display: flex;
   justify-content: space-between;

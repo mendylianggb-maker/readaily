@@ -2,7 +2,7 @@ const library = require('../../utils/library')
 const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
 const checkins = require('../../utils/checkins')
-const { loadSettings, saveSettings, readerStyle } = require('../../utils/settings')
+const { FONTS, loadSettings, saveSettings, readerStyle } = require('../../utils/settings')
 const { todayKey, shortLabel } = require('../../utils/dates')
 const { countUnits, readingMinutes } = require('../../utils/text-stats')
 const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
@@ -21,7 +21,11 @@ Page({
     panel: false, // Aa settings panel
     sizeOptions: ['小', '中', '大', '特大'],
     lineOptions: ['紧凑', '适中', '宽松'],
-    fontOptions: [{ value: 'sans', label: '无衬线' }, { value: 'serif', label: '衬线' }],
+    // Shown in their own typeface so the difference is visible.
+    fontOptions: [
+      { value: 'sans', label: '黑体 Aa', family: FONTS.sans },
+      { value: 'serif', label: '宋体 Aa', family: FONTS.serif }
+    ],
     themeOptions: [
       { value: 'auto', label: '跟随系统' },
       { value: 'light', label: '白色' },
@@ -165,6 +169,8 @@ Page({
     const today = todayKey()
     const ahead = plans.nextAheadIndex(plan, today)
     const overdue = plans.overdueIndexes(plan, today)
+    const t = plans.todayIndex(plan, today)
+    const todayIndex = t !== -1 && t !== this.index && !plan.sessions[t].done ? t : -1
     this.setData({
       mode: 'reread',
       result: {
@@ -172,6 +178,8 @@ Page({
         newCards: result.newCards,
         aheadIndex: ahead,
         aheadLabel: ahead === -1 ? '' : shortLabel(plan.sessions[ahead].date),
+        todayIndex,
+        todayLabel: todayIndex === -1 ? '' : shortLabel(plan.sessions[todayIndex].date),
         overdueIndex: overdue.length ? overdue[0] : -1
       }
     })
@@ -188,6 +196,10 @@ Page({
 
   onReadAhead() {
     this.openSession(this.data.result.aheadIndex)
+  },
+
+  onReadToday() {
+    this.openSession(this.data.result.todayIndex)
   },
 
   onCatchUp() {

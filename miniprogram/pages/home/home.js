@@ -19,7 +19,7 @@ Page({
     const r = checkins.loadRewards()
     wx.showModal({
       title: '获得一张时光书签 🔖',
-      content: r.explained ? '连续打卡 14 天，奖励一张时光书签。' : BOOKMARK_EXPLAINER,
+      content: r.explained ? '连续打卡 ' + checkins.STREAK_FOR_CARD + ' 天，奖励一张时光书签。' : BOOKMARK_EXPLAINER,
       showCancel: false,
       confirmText: '知道了'
     })
@@ -54,6 +54,11 @@ Page({
 
   onBookshelf() {
     wx.switchTab({ url: '/pages/bookshelf/bookshelf' })
+  },
+
+  onWeekDay(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (index >= 0) this.openSession(index)
   },
 
   onCalendar() {

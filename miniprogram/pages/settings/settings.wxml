@@ -24,5 +24,9 @@
       <text class="opt" bindtap="onNextWeek">+7 天</text>
       <text class="opt" bindtap="onResetDay">回到今天</text>
     </view>
+    <view class="dev-note text-secondary">在模拟日期里的打卡会一直留着，回到今天也不会撤掉。想从头测，就清空数据。</view>
+    <view class="options">
+      <text class="opt text-danger" bindtap="onClearAll">清空所有数据</text>
+    </view>
   </view>
 </view>
