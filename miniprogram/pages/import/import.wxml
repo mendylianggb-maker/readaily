@@ -1,22 +1,64 @@
 <view class="container">
-  <view class="card">
+  <view wx:if="{{!book}}" class="card">
     <view>从微信聊天记录里选一本书（txt 或 epub）。</view>
     <view class="text-secondary">可以先把文件发到「文件传输助手」。</view>
   </view>
 
-  <button class="btn-primary" bindtap="onChooseFile" loading="{{loading}}" disabled="{{loading}}">
-    选择文件
-  </button>
+  <button
+    class="{{book ? '' : 'btn-primary'}}"
+    bindtap="onChooseFile"
+    loading="{{loading}}"
+    disabled="{{loading}}"
+  >{{book ? '重新选择' : '选择文件'}}</button>
 
-  <view wx:if="{{error}}" class="card text-danger error">{{error}}</view>
+  <view wx:if="{{error}}" class="card text-danger gap-top">{{error}}</view>
 
-  <view wx:if="{{file}}" class="card file-info">
-    <view class="file-name">{{file.name}}</view>
-    <view class="text-secondary">{{file.ext}} · {{file.sizeText}}<block wx:if="{{encoding}}"> · {{encoding}}</block></view>
-  </view>
+  <block wx:if="{{book}}">
+    <view class="card gap-top">
+      <view class="field">
+        <view class="text-secondary">书名</view>
+        <input class="input" value="{{book.title}}" bindinput="onTitleInput" placeholder="请填写书名" />
+      </view>
+      <view class="field">
+        <view class="text-secondary">作者</view>
+        <input class="input" value="{{book.author}}" bindinput="onAuthorInput" placeholder="可不填" />
+      </view>
 
-  <view wx:if="{{preview}}" class="card">
-    <view class="text-secondary">开头预览</view>
-    <text class="preview" user-select>{{preview}}</text>
-  </view>
+      <view class="stats">
+        <view class="stat">
+          <view class="stat-value">{{book.amountText}}</view>
+          <view class="text-secondary">{{book.languageText}}</view>
+        </view>
+        <view class="stat">
+          <view class="stat-value">{{book.chapterCount || '无'}}</view>
+          <view class="text-secondary">章节</view>
+        </view>
+        <view class="stat">
+          <view class="stat-value">约 {{book.days}} 天</view>
+          <view class="text-secondary">每天 {{book.dailyMinutes}} 分钟</view>
+        </view>
+      </view>
+      <view class="text-secondary">{{file.name}} · {{file.sizeText}} · {{book.encoding}}</view>
+    </view>
+
+    <view wx:if="{{book.chapterCount}}" class="card">
+      <view class="text-secondary">目录</view>
+      <block wx:for="{{chapterTitles}}" wx:key="index">
+        <view wx:if="{{showAllChapters || index < 8}}" class="chapter">{{item}}</view>
+      </block>
+      <view wx:if="{{chapterTitles.length > 8}}" class="toggle" bindtap="onToggleChapters">
+        {{showAllChapters ? '收起' : '展开全部 ' + chapterTitles.length + ' 章'}}
+      </view>
+    </view>
+    <view wx:else class="card text-secondary">
+      没有识别到章节，会按段落拆分每天的阅读量。
+    </view>
+
+    <view class="card">
+      <view class="text-secondary">开头预览</view>
+      <text class="preview" user-select>{{preview}}</text>
+    </view>
+
+    <button class="btn-primary" bindtap="onConfirm">确认导入</button>
+  </block>
 </view>
