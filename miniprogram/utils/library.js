@@ -97,10 +97,33 @@ function removeBookFiles(id) {
   }
 }
 
-/** Remove a book's text, chapters, and progress. Check-in history is kept elsewhere. */
+/** Remove a book's text, chapters, plan, and progress. Check-in history is kept elsewhere. */
 function deleteBook(id) {
   removeBookFiles(id)
+  try {
+    wx.removeStorageSync('plan:' + id)
+    wx.removeStorageSync('progress:' + id)
+  } catch (err) {
+    console.error(err)
+  }
+  if (getCurrentBookId() === id) setCurrentBookId('')
   saveBookList(listBooks().filter((b) => b.id !== id))
+}
+
+function getBook(id) {
+  return listBooks().find((b) => b.id === id) || null
+}
+
+function updateBook(id, patch) {
+  saveBookList(listBooks().map((b) => (b.id === id ? Object.assign({}, b, patch) : b)))
+}
+
+function getCurrentBookId() {
+  return wx.getStorageSync('currentBookId') || ''
+}
+
+function setCurrentBookId(id) {
+  wx.setStorageSync('currentBookId', id)
 }
 
 function readBookText(id) {
@@ -113,6 +136,10 @@ function getBookDetail(id) {
 
 module.exports = {
   listBooks,
+  getBook,
+  updateBook,
+  getCurrentBookId,
+  setCurrentBookId,
   findDuplicate,
   addBook,
   deleteBook,
