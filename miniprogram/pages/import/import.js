@@ -181,7 +181,7 @@ Page({
       return
     }
 
-    const duplicate = library.findDuplicate(title, this.parsed.stats)
+    const duplicate = library.findDuplicate(this.parsed.stats, this.parsed.hasChapters ? this.parsed.chapters.length : 0)
     if (duplicate) {
       const choice = await askDuplicate()
       if (choice === 'cancel') return
@@ -252,7 +252,7 @@ function writeCoverPreview(cover) {
 function askDuplicate() {
   return new Promise((resolve) => {
     wx.showActionSheet({
-      alertText: '这本书已经在书架上了',
+      alertText: '书架上已经有一本内容相同的书了',
       itemList: ['覆盖原来的', '两本都保留'],
       success: (res) => resolve(res.tapIndex === 0 ? 'overwrite' : 'keep'),
       fail: () => resolve('cancel')

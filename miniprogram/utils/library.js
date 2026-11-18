@@ -39,10 +39,14 @@ function saveBookList(books) {
   wx.setStorageSync(BOOKS_KEY, books)
 }
 
-/** A book with the same title and the same size is treated as a duplicate. */
-function findDuplicate(title, stats) {
+/**
+ * A book with the same content size and chapter count is treated as a
+ * duplicate. The title is not compared: a re-sent file may be renamed
+ * (e.g. "book(1).txt"), and the user may have edited the title.
+ */
+function findDuplicate(stats, chapterCount) {
   return listBooks().find(
-    (b) => b.title === title && b.stats.cjk === stats.cjk && b.stats.words === stats.words
+    (b) => b.stats && b.stats.cjk === stats.cjk && b.stats.words === stats.words && (b.chapterCount || 0) === chapterCount
   )
 }
 

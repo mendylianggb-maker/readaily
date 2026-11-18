@@ -41,6 +41,8 @@ function titleFromFileName(fileName) {
     .replace(/\.[^.]+$/, '')
     .replace(/[《》]/g, '')
     .replace(/[（(\[【](全本|全集|完结|精校|校对|txt)[^）)\]】]*[）)\]】]/gi, '')
+    // WeChat appends "(1)", "(2)" when the same file is received again.
+    .replace(/\s*[（(]\d{1,3}[）)]\s*$/, '')
     .trim()
 }
 

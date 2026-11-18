@@ -125,6 +125,11 @@ check('shelf info for a new book shows reading time', /^约 \d+ (小时|分钟)$
 check('shelf info for the current book shows progress', reading.shelfInfo(lib.getBook(A)).info === '0%')
 lib.deleteBook(N)
 
+// Duplicates are found by content, not title; WeChat's "(1)" suffix is dropped.
+check('re-sent file name keeps the title', parseTxt(text, 'Book(1).txt').title === 'Book' && parseTxt(text, '书名（2）.txt').title === '书名')
+check('same content is a duplicate even with another title', lib.findDuplicate(p.stats, p.chapters.length) !== undefined)
+check('different content is not a duplicate', lib.findDuplicate({ cjk: 1, words: 0 }, 0) === undefined)
+
 // Extras (skipped EPUB items) are stored and readable.
 const E = lib.addBook({ text, parsed: p, title: 'E', author: '', format: 'epub', extras: [{ title: 'Copyright', text: 'All rights reserved.\n' }, { title: 'Index', text: 'A, B, C\n' }] })
 const ex = lib.getBookDetail(E.id).extras
