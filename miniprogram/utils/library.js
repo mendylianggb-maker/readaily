@@ -4,6 +4,7 @@
 //   storage "books"        -> BookMeta[] (light, used by the bookshelf)
 //   storage "book:<id>"    -> { chapters } (per book, can be large)
 //   file    books/<id>/text.txt -> full decoded text (UTF-8)
+//   file    books/<id>/cover.<ext> -> cover image (EPUB only, optional)
 
 const BOOKS_KEY = 'books'
 const detailKey = (id) => 'book:' + id
@@ -48,7 +49,7 @@ function findDuplicate(title, stats) {
  * Save a parsed book. Throws on failure (e.g. storage full) after cleaning up.
  * @returns {object} the new BookMeta
  */
-function addBook({ text, parsed, title, author, format }) {
+function addBook({ text, parsed, title, author, format, cover }) {
   const fs = wx.getFileSystemManager()
   const id = newId()
   const meta = {
@@ -67,6 +68,12 @@ function addBook({ text, parsed, title, author, format }) {
   try {
     fs.mkdirSync(bookDir(id), true)
     fs.writeFileSync(textPath(id), text, 'utf8')
+    if (cover) {
+      // Copy into a standalone ArrayBuffer: the Uint8Array may be a view into a larger buffer.
+      const data = cover.data.buffer.slice(cover.data.byteOffset, cover.data.byteOffset + cover.data.byteLength)
+      meta.coverPath = bookDir(id) + '/cover.' + cover.ext
+      fs.writeFileSync(meta.coverPath, data)
+    }
     wx.setStorageSync(detailKey(id), { chapters: parsed.chapters })
     saveBookList(listBooks().concat(meta))
   } catch (err) {

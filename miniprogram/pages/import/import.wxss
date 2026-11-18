@@ -44,3 +44,44 @@
   white-space: pre-wrap;
   font-size: 28rpx;
 }
+
+.cover {
+  display: block;
+  width: 200rpx;
+  height: 280rpx;
+  margin: 0 auto 24rpx;
+  border-radius: 8rpx;
+}
+
+.skipped {
+  display: flex;
+  align-items: flex-start;
+}
+
+.skipped-text {
+  flex: 1;
+}
+
+.link {
+  color: var(--color-primary);
+  font-size: 28rpx;
+  margin-left: 24rpx;
+  flex-shrink: 0;
+}
+
+.gap-small {
+  margin: 16rpx 0 8rpx;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  font-size: 28rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.check {
+  margin-right: 16rpx;
+  font-size: 34rpx;
+}

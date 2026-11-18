@@ -15,6 +15,7 @@
 
   <block wx:if="{{book}}">
     <view class="card gap-top">
+      <image wx:if="{{coverPreview}}" class="cover" src="{{coverPreview}}" mode="aspectFit" />
       <view class="field">
         <view class="text-secondary">书名</view>
         <input class="input" value="{{book.title}}" bindinput="onTitleInput" placeholder="请填写书名" />
@@ -38,7 +39,7 @@
           <view class="text-secondary">每天 {{book.dailyMinutes}} 分钟</view>
         </view>
       </view>
-      <view class="text-secondary">{{file.name}} · {{file.sizeText}} · {{book.encoding}}</view>
+      <view class="text-secondary">{{file.name}} · {{file.sizeText}} · {{book.detail}}</view>
     </view>
 
     <view wx:if="{{book.chapterCount}}" class="card">
@@ -50,6 +51,26 @@
     </view>
     <view wx:else class="card text-secondary">
       没有识别到章节，会按段落拆分每天的阅读量。
+    </view>
+
+    <view wx:if="{{items.length}}" class="card">
+      <view class="skipped">
+        <text class="text-secondary skipped-text">{{skippedText || '没有跳过任何内容'}}</text>
+        <text class="link" bindtap="onToggleItems">{{showItems ? '收起' : '调整'}}</text>
+      </view>
+      <block wx:if="{{showItems}}">
+        <view class="text-secondary gap-small">勾选的内容会放进每天的阅读里。</view>
+        <view
+          wx:for="{{items}}"
+          wx:key="index"
+          class="item"
+          data-index="{{index}}"
+          bindtap="onItemTap"
+        >
+          <text class="check">{{item.included ? '☑' : '☐'}}</text>
+          <text class="{{item.included ? '' : 'text-secondary'}}">{{item.title}}</text>
+        </view>
+      </block>
     </view>
 
     <view class="card">
