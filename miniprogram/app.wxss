@@ -151,5 +151,5 @@ button.btn-secondary {
 .state-overdue { background: #E3DACB; color: #5E5448; }
 .state-today, .state-upcoming { border: 2rpx dashed #CBBFAA; color: #7A6F62; }
 .state-none { color: #B5AA98; }
-.is-today { border: 4rpx solid #3E6B4E; color: #3E6B4E; font-weight: 700; }
-.state-onTime.is-today, .state-late.is-today { box-shadow: 0 0 0 4rpx #FFFDF8 inset; }
+.is-today { font-weight: 700; box-shadow: 0 0 0 4rpx #FFFDF8, 0 0 0 8rpx #2B2620; }
+.state-today.is-today, .state-upcoming.is-today, .state-none.is-today { border: 4rpx solid #2B2620; color: #2B2620; box-shadow: none; }

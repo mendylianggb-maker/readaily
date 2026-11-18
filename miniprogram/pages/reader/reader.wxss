@@ -1,4 +1,6 @@
 .reader {
+  width: 100%;
+  overflow-x: hidden;
   min-height: 100vh;
   padding: 24rpx 56rpx 80rpx;
   box-sizing: border-box;
@@ -52,14 +54,21 @@
   opacity: 0.6;
 }
 
+.body {
+  width: 100%;
+}
+
 .para {
-  display: block;
   margin-bottom: 0.9em;
   text-align: justify;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .para.indent {
   text-indent: 2em;
+  word-break: break-all; /* Chinese text: wrap anywhere, never scroll sideways */
 }
 
 .footer {

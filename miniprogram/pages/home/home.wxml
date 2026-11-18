@@ -13,7 +13,7 @@
         <image class="pill-icon" src="/images/icons/bookmark.svg" />
         <text>{{view.cards}}</text>
       </view>
-      <image class="settings" src="/images/icons/settings.svg" bindtap="onSettings" aria-label="设置" />
+      <view class="settings" bindtap="onSettings" aria-label="设置"><image class="settings-icon" src="/images/icons/settings.svg" /><text class="settings-text">设置</text></view>
     </view>
   </view>
 

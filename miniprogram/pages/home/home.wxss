@@ -32,10 +32,21 @@
 }
 
 .settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 20rpx;
+}
+
+.settings-icon {
   width: 40rpx;
   height: 40rpx;
-  padding: 16rpx;
-  margin-right: -16rpx;
+}
+
+.settings-text {
+  font-size: 18rpx;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
 }
 
 .title {
