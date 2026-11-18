@@ -1,3 +1,45 @@
-<view class="container">
-  <text>settings (TODO)</text>
+<view class="container" wx:if="{{settings}}">
+  <view
+    class="card sample"
+    style="background: {{style.theme.bg}}; color: {{style.theme.text}}; font-size: {{style.fontSize}}rpx; line-height: {{style.lineHeight}}; font-family: {{style.fontFamily}};"
+  >
+    <text>海风吹过小镇的屋顶，林夏在笔记本上写下今天的天气。The sea was calm that morning.</text>
+  </view>
+
+  <view class="card">
+    <view class="row">
+      <text class="row-title">字号</text>
+      <view class="options">
+        <text wx:for="{{sizeOptions}}" wx:key="index" class="opt {{settings.fontSize === index ? 'on' : ''}}" data-value="{{index}}" bindtap="onSize">{{item}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">行距</text>
+      <view class="options">
+        <text wx:for="{{lineOptions}}" wx:key="index" class="opt {{settings.lineHeight === index ? 'on' : ''}}" data-value="{{index}}" bindtap="onLine">{{item}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">字体</text>
+      <view class="options">
+        <text wx:for="{{fontOptions}}" wx:key="value" class="opt {{settings.font === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onFont">{{item.label}}</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row-title">背景</text>
+      <view class="options">
+        <text wx:for="{{themeOptions}}" wx:key="value" class="opt {{settings.theme === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onTheme">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{plan}}" class="card">
+    <view class="text-secondary">《{{plan.title}}》的阅读计划</view>
+    <view class="row">
+      <text class="row-title">每天</text>
+      <view class="options">
+        <text wx:for="{{minuteOptions}}" wx:key="*this" class="opt {{plan.dailyMinutes === item ? 'on' : ''}}" data-value="{{item}}" bindtap="onMinutes">{{item}} 分钟</text>
+      </view>
+    </view>
+  </view>
 </view>

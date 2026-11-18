@@ -1,7 +1,79 @@
-<view class="container">
-  <view class="card">
-    <view>还没有在读的书</view>
-    <view class="text-secondary">导入一本书，开始每天 10 分钟的阅读。</view>
+<view class="container" wx:if="{{view}}">
+  <view class="topbar">
+    <view class="streak" bindtap="onCalendar">
+      <text>🔥 连续 {{view.streak}} 天</text>
+      <text class="cards">🔖 ×{{view.cards}}</text>
+    </view>
+    <text class="link" bindtap="onSettings">设置</text>
   </view>
-  <button class="btn-primary" bindtap="onImport">导入书</button>
+
+  <!-- No book on the shelf: onboarding guide -->
+  <block wx:if="{{!view.book && !view.hasBooks}}">
+    <view class="card">
+      <view class="title">开始每天 10 分钟的阅读</view>
+      <view class="steps">
+        <view class="step"><text class="step-no">1</text>在手机「文件」里找到 txt 或 epub</view>
+        <view class="step"><text class="step-no">2</text>点「分享」，发给微信「文件传输助手」</view>
+        <view class="step"><text class="step-no">3</text>回到这里，点「导入书」，从聊天里选它</view>
+        <view class="step"><text class="step-no">4</text>选好每天读多久，今天就能开始读第一段</view>
+      </view>
+    </view>
+    <button class="btn-primary" bindtap="onImport">导入书</button>
+  </block>
+
+  <!-- Books exist but none is being read -->
+  <block wx:elif="{{!view.book}}">
+    <view class="card center">
+      <view>现在没有在读的书</view>
+      <view class="text-secondary">去书架选一本开始读吧。</view>
+    </view>
+    <button class="btn-primary" bindtap="onBookshelf">去书架</button>
+  </block>
+
+  <block wx:else>
+    <view class="card book">
+      <image wx:if="{{view.book.coverPath}}" class="cover" src="{{view.book.coverPath}}" mode="aspectFill" />
+      <view wx:else class="cover placeholder" style="background: {{view.book.coverColor}}">{{view.book.title}}</view>
+      <view class="book-info">
+        <view class="book-title">{{view.book.title}}</view>
+        <view class="text-secondary">每天 {{view.dailyMinutes}} 分钟 · 共 {{view.totalSessions}} 天</view>
+        <view class="progress"><view class="progress-bar" style="width: {{view.progress}}%"></view></view>
+        <view class="text-secondary">已读 {{view.progress}}%</view>
+      </view>
+    </view>
+
+    <view class="card today">
+      <block wx:if="{{view.todaySession}}">
+        <view class="text-secondary">今天 {{view.todayLabel}} · 第 {{view.todaySession.day}} 天 · 约 {{view.dailyMinutes}} 分钟</view>
+        <view class="session-label">{{view.todaySession.label || '今天的阅读'}}</view>
+        <button wx:if="{{!view.todaySession.done}}" class="btn-primary" bindtap="onReadToday">开始阅读</button>
+        <block wx:else>
+          <view class="done">今天的已经读完了 ✓</view>
+          <button wx:if="{{view.aheadIndex >= 0}}" size="mini" bindtap="onReadAhead">提前读 {{view.aheadLabel}} 的</button>
+        </block>
+      </block>
+      <block wx:else>
+        <view class="text-secondary">今天 {{view.todayLabel}}</view>
+        <view class="session-label">今天没有排新的内容</view>
+        <button wx:if="{{view.aheadIndex >= 0}}" size="mini" bindtap="onReadAhead">提前读 {{view.aheadLabel}} 的</button>
+      </block>
+    </view>
+
+    <view wx:if="{{view.showReschedule}}" class="card banner">
+      <text>落后 {{view.overdueCount}} 天了</text>
+      <text class="link" bindtap="onReschedule">重新排期</text>
+    </view>
+    <view wx:elif="{{view.overdueCount > 0}}" class="card banner">
+      <text>有 {{view.overdueCount}} 天待补读（从 {{view.firstOverdueLabel}} 开始）</text>
+      <text class="link" bindtap="onCatchUp">去补读</text>
+    </view>
+    <view wx:if="{{view.showReschedule}}" class="catchup-link text-secondary" bindtap="onCatchUp">或者继续补读 {{view.firstOverdueLabel}} 的 ›</view>
+
+    <view class="card week" bindtap="onCalendar">
+      <view wx:for="{{view.week}}" wx:key="date" class="week-day">
+        <view class="text-secondary">{{item.name}}</view>
+        <view class="dot state-{{item.state}} {{item.isToday ? 'is-today' : ''}}">{{item.day}}</view>
+      </view>
+    </view>
+  </block>
 </view>

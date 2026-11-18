@@ -11,8 +11,10 @@
       class="book"
       data-id="{{item.id}}"
       data-title="{{item.title}}"
+      bindtap="onBookTap"
       bindlongpress="onBookLongPress"
     >
+      <view wx:if="{{item.statusText}}" class="badge badge-{{item.status}}">{{item.statusText}}</view>
       <image wx:if="{{item.coverPath}}" class="cover" src="{{item.coverPath}}" mode="aspectFill" />
       <view wx:else class="cover placeholder" style="background: {{item.coverColor}}">
         <text class="placeholder-title">{{item.coverText}}</text>
@@ -23,5 +25,5 @@
   </view>
 
   <button class="btn-primary import" bindtap="onImport">导入书</button>
-  <view wx:if="{{books.length}}" class="text-secondary hint">长按书可以删除</view>
+  <view wx:if="{{books.length}}" class="text-secondary hint">点书可以开始读或删除</view>
 </view>

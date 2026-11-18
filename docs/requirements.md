@@ -102,8 +102,10 @@ Session states:
 - **Reading today**: the home page shows today's session and the number of overdue sessions, e.g. "Today 11/17 · Day 23 [Start]" and "1 day to catch up (11/16) [Catch up]".
 - **Skipping**: no explicit skip action. The user simply reads today's session; earlier unread sessions stay `overdue` and can be opened from the calendar any time.
 - **Reading ahead**: allowed. The user can keep reading future sessions in order (e.g. before a holiday or trip). A session read early counts as `onTime` and is green.
+  - "In order" means: once today's session (if any) is read, the first unread future session can be read. Overdue sessions do not block reading ahead.
 - **Rescheduling**: when overdue sessions reach **7 or more**, offer a **Reschedule** button that moves all unread sessions to start from today (clears the backlog, pushes the end date out). Optional; the user can keep catching up instead.
 - **Changing daily time**: re-split the unread part and reschedule it starting today. Finished sessions and check-ins are unchanged.
+  - Precisely: everything up to the last read session is kept; the text after it is re-split. If that starts mid-chapter, the label shows "（续）". The setting lives on the Settings page under the current book's plan.
 
 ### 2.4 Switching books
 

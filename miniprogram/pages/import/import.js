@@ -10,6 +10,8 @@ const { parseTxt } = require('../../utils/txt-parser')
 const { parseEpub, assembleBook } = require('../../utils/epub-parser')
 const { readingMinutes, formatAmount } = require('../../utils/text-stats')
 const library = require('../../utils/library')
+const reading = require('../../utils/reading')
+const { chooseDailyMinutes } = require('../../utils/ui')
 
 const PREVIEW_CHARS = 300
 const DEFAULT_DAILY_MINUTES = 10
@@ -194,8 +196,9 @@ Page({
     }
 
     wx.showLoading({ title: '保存中', mask: true })
+    let saved
     try {
-      library.addBook({
+      saved = library.addBook({
         text: this.text,
         parsed: this.parsed,
         title,
@@ -214,6 +217,16 @@ Page({
       return
     }
     wx.hideLoading()
+
+    // Nothing being read yet: set up the plan right away (requirements 1.2 step 5).
+    if (!library.getCurrentBookId()) {
+      const minutes = await chooseDailyMinutes('已加入书架，每天读多久？')
+      if (minutes) {
+        reading.startBook(saved.id, minutes)
+        wx.switchTab({ url: '/pages/home/home' })
+        return
+      }
+    }
     wx.showToast({ title: '已加入书架', icon: 'success' })
     setTimeout(() => wx.switchTab({ url: '/pages/bookshelf/bookshelf' }), 800)
   }

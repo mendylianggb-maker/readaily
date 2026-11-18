@@ -1,3 +1,27 @@
-<view class="container">
-  <text>finish (TODO)</text>
+<view class="page">
+  <view class="confetti">
+    <view
+      wx:for="{{confetti}}"
+      wx:key="index"
+      class="piece"
+      style="left: {{item.left}}%; background: {{item.color}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s; transform: rotate({{item.rotate}}deg);"
+    ></view>
+  </view>
+
+  <view class="content">
+    <view class="big">🎉</view>
+    <view class="headline">读完啦！</view>
+    <view class="book-title">《{{title}}》</view>
+
+    <view class="card stats">
+      <view class="stat"><view class="stat-value">{{days}}</view><view class="text-secondary">阅读天数</view></view>
+      <view class="stat"><view class="stat-value">{{onTimeRate}}%</view><view class="text-secondary">按时完成</view></view>
+      <view class="stat"><view class="stat-value">{{amountText}}</view><view class="text-secondary">读了</view></view>
+    </view>
+
+    <view class="message">{{message}}</view>
+
+    <button class="btn-primary" bindtap="onImport">导入下一本</button>
+    <button class="secondary" bindtap="onBookshelf">去书架</button>
+  </view>
 </view>

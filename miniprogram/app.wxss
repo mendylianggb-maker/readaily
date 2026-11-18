@@ -40,3 +40,11 @@ page {
 .text-danger {
   color: var(--color-danger);
 }
+
+/* Session state marks, shared by home week strip and calendar. */
+.state-onTime { background: #4caf7a; color: #fff; }
+.state-late { background: #f2c14e; color: #fff; }
+.state-overdue { background: #dddddd; color: #888; }
+.state-today, .state-upcoming { border: 2rpx solid #c8c8c8; }
+.state-none { color: #bbbbbb; }
+.is-today { box-shadow: 0 0 0 4rpx var(--color-primary); }
