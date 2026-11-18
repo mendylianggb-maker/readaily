@@ -149,7 +149,7 @@ Session states:
 |---|-------|----------|
 | 1 | Paging | Vertical scrolling. Horizontal page turning is out of scope for v1. |
 | 2 | Completion | The session counts as read only when the user taps **Finish** at the end (no auto check-in). No minimum reading time. |
-| 3 | After finishing | Show a check-in animation and the current streak; show an extra notice when a Time Bookmark card is earned. Then offer **Read today's** (if today's session is still unread, e.g. after a catch-up), **Continue catching up** (with the next date and days left, only if there are overdue sessions), and **Read ahead** (only when today is done and nothing is overdue). The finish button always reads 完成阅读. |
+| 3 | After finishing | Show a check-in animation and the current streak; show an extra notice when a Time Bookmark card is earned. Then offer **Continue catching up** (with the next date, only if there are overdue sessions; shown first), **Read today's** (if today's session is still unread), and **Read ahead** (only when today is done and nothing is overdue). The finish button always reads 完成阅读. |
 | 4 | Leaving mid-session | Remember the scroll position within the session and restore it next time. |
 | 5 | Keep screen on | `wx.setKeepScreenOn` while reading. |
 | 6 | Reading time | Record actual time spent per session silently (not shown); used later to calibrate reading speed. |

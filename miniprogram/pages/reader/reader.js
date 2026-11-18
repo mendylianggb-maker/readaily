@@ -186,8 +186,7 @@ Page({
         todayIndex,
         todayLabel: todayIndex === -1 ? '' : shortLabel(plan.sessions[todayIndex].date),
         overdueIndex: overdue.length ? overdue[0] : -1,
-        overdueLabel: overdue.length ? shortLabel(plan.sessions[overdue[0]].date) : '',
-        overdueCount: overdue.length
+        overdueLabel: overdue.length ? shortLabel(plan.sessions[overdue[0]].date) : ''
       }
     })
     // First card ever: explain what it is.
