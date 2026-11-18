@@ -86,7 +86,8 @@ Page({
     const chapters = library.getBookDetail(this.bookId).chapters
     const done = plan.sessions.filter((s) => s.done).length
 
-    const blocks = buildBlocks(text, chapters, session)
+    const indent = book.language !== 'en'
+    const blocks = buildBlocks(text, chapters, session, indent)
     wx.setNavigationBarTitle({ title: book.title })
     this.setData({
       loaded: true,
@@ -99,7 +100,7 @@ Page({
         progress: Math.round((done / plan.sessions.length) * 100)
       },
       blocks,
-      indent: book.language !== 'en',
+      indent,
       // Mid-chapter sessions have no inline heading, so show where we are.
       continued: !blocks.length || blocks[0].type !== 'h',
       finishText: '完成阅读'
@@ -220,8 +221,11 @@ Page({
   noop() {}
 })
 
-/** Paragraphs of a session, with inline titles where a chapter starts. */
-function buildBlocks(text, chapters, session) {
+/**
+ * Paragraphs of a session, with inline titles where a chapter starts.
+ * Chinese paragraphs start with two ideographic spaces (the usual indent).
+ */
+function buildBlocks(text, chapters, session, indent) {
   const blocks = []
   for (const ch of chapters) {
     if (ch.end <= session.s || ch.start >= session.e) continue
@@ -231,7 +235,7 @@ function buildBlocks(text, chapters, session) {
     if (startsHere && chapters.length > 1) blocks.push({ type: 'h', text: ch.title })
     text.slice(from, to).split('\n').forEach((line) => {
       const t = line.trim()
-      if (t) blocks.push({ type: 'p', text: t })
+      if (t) blocks.push({ type: 'p', text: indent ? '\u3000\u3000' + t : t })
     })
   }
   return blocks

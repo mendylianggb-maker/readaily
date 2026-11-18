@@ -53,6 +53,12 @@ button.btn-primary {
   padding: 0;
 }
 
+/* Style v2 gives buttons a fixed 184px width; ours span the column. */
+button.btn-primary:not([size=mini]),
+button.btn-secondary:not([size=mini]) {
+  width: 100%;
+}
+
 button.btn-primary::after,
 button.btn-secondary::after {
   border: none;

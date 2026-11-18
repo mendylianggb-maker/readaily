@@ -25,7 +25,7 @@
         <text>{{item.text}}</text>
         <view class="chapter-rule" style="background: {{style.theme.secondary}}"></view>
       </view>
-      <view wx:else class="para {{indent ? 'indent' : ''}}">{{item.text}}</view>
+      <view wx:else class="para {{indent ? 'cjk' : ''}}"><text class="para-text" user-select>{{item.text}}</text></view>
     </block>
   </view>
 

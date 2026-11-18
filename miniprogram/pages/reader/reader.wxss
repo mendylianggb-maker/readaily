@@ -66,8 +66,7 @@
   word-wrap: break-word;
 }
 
-.para.indent {
-  text-indent: 2em;
+.para.cjk {
   word-break: break-all; /* Chinese text: wrap anywhere, never scroll sideways */
 }
 
@@ -180,4 +179,11 @@
   text-align: center;
   font-size: 0.85em;
   margin: 40rpx 0 48rpx;
+}
+
+/* Selectable text renders as nested inline boxes, so CSS text-indent would
+   push whole boxes sideways. Chinese paragraphs are indented with two
+   ideographic spaces in the text instead (see buildBlocks). */
+.para-text {
+  display: block;
 }

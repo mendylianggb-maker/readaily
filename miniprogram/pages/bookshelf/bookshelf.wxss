@@ -11,7 +11,7 @@
   line-height: 1.3;
 }
 
-button.import {
+button.import:not([size=mini]) {
   width: auto;
   margin: 0;
   height: 72rpx;
