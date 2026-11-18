@@ -12,7 +12,7 @@ const library = require('../../utils/library')
 
 const PREVIEW_CHARS = 300
 const DEFAULT_DAILY_MINUTES = 10
-const CHAPTER_PREVIEW_COUNT = 5
+const CHAPTER_PREVIEW_COUNT = 3
 
 Page({
   data: {
