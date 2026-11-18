@@ -13,6 +13,16 @@ See [docs/requirements.md](docs/requirements.md) for the full v1 requirements.
 1. Install [WeChat DevTools](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html).
 2. Import this folder as a mini program project and set your own AppID (or a test AppID).
 
+### Tests
+
+The scheduling, check-in, and reward logic runs in Node with a mocked `wx` and clock:
+
+```sh
+node tests/sim.js
+```
+
+It simulates several weeks of use (missed days, catch-up, reading ahead, rescheduling, switching books, Time Bookmarks) and prints one line per check.
+
 ## License
 
 MIT
