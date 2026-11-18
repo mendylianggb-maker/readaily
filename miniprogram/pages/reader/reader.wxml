@@ -67,8 +67,8 @@
     <view class="sheet-streak">已连续 {{result.streak}} 天</view>
     <view wx:if="{{result.newCards > 0}}" class="sheet-card">获得 {{result.newCards}} 张时光书签 🔖</view>
     <button wx:if="{{result.todayIndex >= 0}}" class="btn-primary sheet-btn" bindtap="onReadToday">读今天的（{{result.todayLabel}}）</button>
-    <button wx:if="{{result.overdueIndex >= 0}}" class="{{result.todayIndex >= 0 ? '' : 'btn-primary'}} sheet-btn" bindtap="onCatchUp">继续补读</button>
-    <button wx:if="{{result.aheadIndex >= 0}}" class="sheet-btn" bindtap="onReadAhead">再读一天（{{result.aheadLabel}}）</button>
+    <button wx:if="{{result.overdueIndex >= 0}}" class="{{result.todayIndex >= 0 ? '' : 'btn-primary'}} sheet-btn" bindtap="onCatchUp">继续补读 {{result.overdueLabel}}（还剩 {{result.overdueCount}} 天）</button>
+    <button wx:if="{{result.aheadIndex >= 0}}" class="sheet-btn" bindtap="onReadAhead">提前读 {{result.aheadLabel}}</button>
     <button class="sheet-btn" bindtap="onBack">返回</button>
   </view>
 </view>

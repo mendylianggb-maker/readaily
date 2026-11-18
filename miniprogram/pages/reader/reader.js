@@ -83,7 +83,6 @@ Page({
     const session = plan.sessions[this.index]
     const text = library.readBookText(this.bookId)
     const chapters = library.getBookDetail(this.bookId).chapters
-    const state = plans.sessionState(session, today)
     const done = plan.sessions.filter((s) => s.done).length
 
     wx.setNavigationBarTitle({ title: book.title })
@@ -98,7 +97,7 @@ Page({
         progress: Math.round((done / plan.sessions.length) * 100)
       },
       blocks: buildBlocks(text, chapters, session),
-      finishText: state === 'overdue' ? '完成补读' : state === 'upcoming' ? '完成提前阅读' : '完成今天的阅读'
+      finishText: '完成阅读'
     })
 
     // Restore the scroll position if this session was left mid-way.
@@ -167,8 +166,9 @@ Page({
     }
     const plan = plans.loadPlan(this.bookId)
     const today = todayKey()
-    const ahead = plans.nextAheadIndex(plan, today)
     const overdue = plans.overdueIndexes(plan, today)
+    // Reading ahead is only offered once nothing is left to catch up.
+    const ahead = overdue.length ? -1 : plans.nextAheadIndex(plan, today)
     const t = plans.todayIndex(plan, today)
     const todayIndex = t !== -1 && t !== this.index && !plan.sessions[t].done ? t : -1
     this.setData({
@@ -180,7 +180,9 @@ Page({
         aheadLabel: ahead === -1 ? '' : shortLabel(plan.sessions[ahead].date),
         todayIndex,
         todayLabel: todayIndex === -1 ? '' : shortLabel(plan.sessions[todayIndex].date),
-        overdueIndex: overdue.length ? overdue[0] : -1
+        overdueIndex: overdue.length ? overdue[0] : -1,
+        overdueLabel: overdue.length ? shortLabel(plan.sessions[overdue[0]].date) : '',
+        overdueCount: overdue.length
       }
     })
     // First card ever: explain what it is.
