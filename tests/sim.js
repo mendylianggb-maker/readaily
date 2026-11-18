@@ -119,6 +119,12 @@ reading.restartBook(A, 10)
 plan = plans.loadPlan(A)
 check('restart: fresh plan from today, A is current, C paused', plan.sessions.every(s => !s.done) && plan.sessions[0].date === '2026-12-01' && lib.getCurrentBookId() === A && lib.getBook(C).status === 'paused')
 
+// Bookshelf line for every status, including a book that was never started.
+const N = lib.addBook({ text, parsed: p, title: 'N', author: '', format: 'txt' }).id
+check('shelf info for a new book shows reading time', /^约 \d+ (小时|分钟)$/.test(reading.shelfInfo(lib.getBook(N)).info))
+check('shelf info for the current book shows progress', reading.shelfInfo(lib.getBook(A)).info === '0%')
+lib.deleteBook(N)
+
 // Extras (skipped EPUB items) are stored and readable.
 const E = lib.addBook({ text, parsed: p, title: 'E', author: '', format: 'epub', extras: [{ title: 'Copyright', text: 'All rights reserved.\n' }, { title: 'Index', text: 'A, B, C\n' }] })
 const ex = lib.getBookDetail(E.id).extras

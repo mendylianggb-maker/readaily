@@ -5,6 +5,7 @@ const library = require('./library')
 const plans = require('./plan')
 const checkins = require('./checkins')
 const { todayKey, addDays, weekStart, shortLabel, fromKey } = require('./dates')
+const { readingMinutes } = require('./text-stats')
 
 /**
  * Start reading a book (new or paused). The current book, if different, is paused.
@@ -168,7 +169,25 @@ function homeView() {
   })
 }
 
+/** Progress and the short line under a book on the bookshelf. */
+function shelfInfo(book) {
+  const plan = plans.loadPlan(book.id)
+  const done = plan ? plan.sessions.filter((s) => s.done).length : 0
+  const progress = plan ? Math.round((done / plan.sessions.length) * 100) : 0
+  let info = ''
+  if (book.status === 'finished') {
+    if (plan) info = '用了 ' + plan.sessions.length + ' 天'
+  } else if (plan) {
+    info = progress + '%'
+  } else if (book.stats) {
+    const minutes = readingMinutes(book.stats)
+    info = minutes >= 60 ? '约 ' + Math.round(minutes / 60) + ' 小时' : '约 ' + Math.max(1, Math.round(minutes)) + ' 分钟'
+  }
+  return { progress, info }
+}
+
 module.exports = {
+  shelfInfo,
   startBook, restartBook, finishSession, rescheduleBook, rescheduleReason, changeDailyMinutes,
   bookmarkSession, dateMap, homeView
 }

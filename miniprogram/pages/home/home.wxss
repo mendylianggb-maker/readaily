@@ -32,11 +32,15 @@
 }
 
 .settings {
-  padding: 16rpx;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 16rpx;
   margin: 0 -16rpx 0 4rpx;
 }
 
 .settings-icon {
+  display: block;
   width: 40rpx;
   height: 40rpx;
 }
