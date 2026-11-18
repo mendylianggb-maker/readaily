@@ -8,6 +8,7 @@ const {
 const { decodeText } = require('../../utils/encoding')
 const { parseTxt } = require('../../utils/txt-parser')
 const { readingMinutes, formatAmount } = require('../../utils/text-stats')
+const library = require('../../utils/library')
 
 const PREVIEW_CHARS = 300
 const DEFAULT_DAILY_MINUTES = 10
@@ -111,12 +112,48 @@ Page({
     this.setData({ 'book.author': e.detail.value })
   },
 
-  onConfirm() {
-    if (!this.data.book.title.trim()) {
+  async onConfirm() {
+    const title = this.data.book.title.trim()
+    const author = this.data.book.author.trim()
+    if (!title) {
       wx.showToast({ title: '请填写书名', icon: 'none' })
       return
     }
-    // Step 4 (save to local storage) comes next.
-    wx.showToast({ title: '保存功能下一步实现', icon: 'none' })
+
+    const duplicate = library.findDuplicate(title, this.parsed.stats)
+    if (duplicate) {
+      const choice = await askDuplicate()
+      if (choice === 'cancel') return
+      if (choice === 'overwrite') library.deleteBook(duplicate.id)
+    }
+
+    wx.showLoading({ title: '保存中', mask: true })
+    try {
+      library.addBook({ text: this.text, parsed: this.parsed, title, author, format: 'txt' })
+    } catch (err) {
+      console.error(err)
+      wx.hideLoading()
+      wx.showModal({
+        title: '保存失败',
+        content: '手机存储空间可能不够了，可以先删掉书架上不读的书再试。',
+        showCancel: false
+      })
+      return
+    }
+    wx.hideLoading()
+    wx.showToast({ title: '已加入书架', icon: 'success' })
+    setTimeout(() => wx.switchTab({ url: '/pages/bookshelf/bookshelf' }), 800)
   }
 })
+
+// Resolves to 'overwrite' | 'keep' | 'cancel'.
+function askDuplicate() {
+  return new Promise((resolve) => {
+    wx.showActionSheet({
+      alertText: '这本书已经在书架上了',
+      itemList: ['覆盖原来的', '两本都保留'],
+      success: (res) => resolve(res.tapIndex === 0 ? 'overwrite' : 'keep'),
+      fail: () => resolve('cancel')
+    })
+  })
+}

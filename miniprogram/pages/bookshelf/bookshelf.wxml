@@ -1,3 +1,27 @@
 <view class="container">
-  <text>bookshelf (TODO)</text>
+  <view wx:if="{{books.length === 0}}" class="card empty">
+    <view>书架上还没有书</view>
+    <view class="text-secondary">把 txt 或 epub 发到微信「文件传输助手」，再回来导入。</view>
+  </view>
+
+  <view class="grid">
+    <view
+      wx:for="{{books}}"
+      wx:key="id"
+      class="book"
+      data-id="{{item.id}}"
+      data-title="{{item.title}}"
+      bindlongpress="onBookLongPress"
+    >
+      <image wx:if="{{item.coverPath}}" class="cover" src="{{item.coverPath}}" mode="aspectFill" />
+      <view wx:else class="cover placeholder" style="background: {{item.coverColor}}">
+        <text class="placeholder-title">{{item.coverText}}</text>
+      </view>
+      <view class="book-title">{{item.title}}</view>
+      <view class="text-secondary book-info">{{item.infoText}}</view>
+    </view>
+  </view>
+
+  <button class="btn-primary import" bindtap="onImport">导入书</button>
+  <view wx:if="{{books.length}}" class="text-secondary hint">长按书可以删除</view>
 </view>
