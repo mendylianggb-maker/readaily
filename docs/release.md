@@ -11,6 +11,7 @@
 
 - The "contact administrators to set this upload to the trial version" message after uploading is a reminder, not an error.
 - Trial members: **Management → Member Management → Trial Members**.
+- Dev tools (simulated date, clear data) are hidden in the trial version: on the settings page, tap the version line at the bottom 7 times to show or hide them. They are always shown in DevTools and preview builds, and never in the released version.
 - Data is stored per AppID on each phone. Updating versions keeps it; changing the AppID does not.
 - Never put the mini program secret key (from the developer settings page) in code or chat.
 

@@ -13,7 +13,7 @@
   <view class="card text-secondary">字号、行距、字体和背景，在阅读页右上角的「Aa」里调整。</view>
 
   <view wx:if="{{dev}}" class="card dev">
-    <view class="dev-title">🛠 模拟日期（只在开发版出现）</view>
+    <view class="dev-title">🛠 开发者工具（正式版不会出现）</view>
     <view class="dev-today">
       现在当作 {{dev.todayLabel}}
       <text wx:if="{{dev.offset}}" class="text-secondary">（{{dev.offset > 0 ? '+' : ''}}{{dev.offset}} 天）</text>
@@ -29,4 +29,5 @@
       <text class="opt text-danger" bindtap="onClearAll">清空所有数据</text>
     </view>
   </view>
+  <view class="version text-secondary" bindtap="onVersionTap">{{versionText}}</view>
 </view>

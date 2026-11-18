@@ -141,8 +141,17 @@ store['debug:dayOffset'] = JSON.stringify(3)
 check('simulated date ignored without a dev build', dates.todayKey() === '2026-12-01')
 global.wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: 'develop' } })
 check('simulated date honored in develop', dates.todayKey() === '2026-12-04')
+global.wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: 'trial' } })
+check('trial: simulated date ignored until dev tools are unlocked', dates.todayKey() === '2026-12-01' && !dates.devToolsEnabled())
+dates.setDevToolsUnlocked(true)
+check('trial: simulated date honored after unlocking', dates.todayKey() === '2026-12-04')
+dates.setDevToolsUnlocked(false)
+check('trial: locking again resets the simulated date', dates.todayKey() === '2026-12-01' && !store['debug:dayOffset'])
+store['debug:dayOffset'] = JSON.stringify(3)
+dates.setDevToolsUnlocked(true)
 global.wx.getAccountInfoSync = () => ({ miniProgram: { envVersion: 'release' } })
-check('simulated date ignored in release', dates.todayKey() === '2026-12-01')
+check('release: simulated date ignored even if unlocked', dates.todayKey() === '2026-12-01' && !dates.devToolsEnabled() && !dates.canUnlockDevTools())
+dates.setDevToolsUnlocked(false)
 delete global.wx.getAccountInfoSync
 
 // Cards cap at 3.

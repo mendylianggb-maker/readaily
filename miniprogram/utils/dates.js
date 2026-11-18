@@ -11,21 +11,49 @@ function fromKey(key) {
   return new Date(y, m - 1, d)
 }
 
-// Simulated date for development: a day offset stored locally, only honored
-// in the develop/trial versions, never in the released mini program.
+// Simulated date for development: a day offset stored locally.
+// Dev tools are always on in the develop version (DevTools, preview QR codes),
+// hidden in the trial version until unlocked on the settings page, and never
+// available in the released mini program.
 const DAY_OFFSET_KEY = 'debug:dayOffset'
+const UNLOCK_KEY = 'debug:unlocked'
 
-function isDevBuild() {
+function envVersion() {
   try {
-    const v = wx.getAccountInfoSync().miniProgram.envVersion
-    return v === 'develop' || v === 'trial'
+    return wx.getAccountInfoSync().miniProgram.envVersion
+  } catch (err) {
+    return 'release'
+  }
+}
+
+/** Whether dev tools can be unlocked at all (not in release). */
+function canUnlockDevTools() {
+  const v = envVersion()
+  return v === 'develop' || v === 'trial'
+}
+
+function devToolsEnabled() {
+  const v = envVersion()
+  if (v === 'develop') return true
+  if (v !== 'trial') return false
+  try {
+    return !!wx.getStorageSync(UNLOCK_KEY)
   } catch (err) {
     return false
   }
 }
 
+/** Turn trial-version dev tools on or off. Turning off also resets the simulated date. */
+function setDevToolsUnlocked(on) {
+  if (on) wx.setStorageSync(UNLOCK_KEY, 1)
+  else {
+    wx.removeStorageSync(UNLOCK_KEY)
+    wx.removeStorageSync(DAY_OFFSET_KEY)
+  }
+}
+
 function getDayOffset() {
-  if (!isDevBuild()) return 0
+  if (!devToolsEnabled()) return 0
   try {
     return Number(wx.getStorageSync(DAY_OFFSET_KEY)) || 0
   } catch (err) {
@@ -70,5 +98,5 @@ function weekStart(key) {
 
 module.exports = {
   toKey, fromKey, todayKey, addDays, diffDays, shortLabel, weekStart,
-  isDevBuild, getDayOffset, setDayOffset
+  envVersion, canUnlockDevTools, devToolsEnabled, setDevToolsUnlocked, getDayOffset, setDayOffset
 }

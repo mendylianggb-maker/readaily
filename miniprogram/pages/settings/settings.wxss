@@ -35,3 +35,9 @@
   font-size: 24rpx;
   margin: 16rpx 0 12rpx;
 }
+
+.version {
+  text-align: center;
+  font-size: 22rpx;
+  padding: 32rpx 0 16rpx;
+}
