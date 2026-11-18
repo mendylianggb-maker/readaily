@@ -5,19 +5,21 @@ const {
   getExtension,
   formatSize
 } = require('../../utils/file')
+const { decodeText } = require('../../utils/encoding')
 
-const PREVIEW_BYTES = 600
+const PREVIEW_CHARS = 300
 
 Page({
   data: {
     file: null, // { name, sizeText, ext }
+    encoding: '',
     preview: '',
     error: '',
     loading: false
   },
 
   async onChooseFile() {
-    this.setData({ error: '', file: null, preview: '' })
+    this.setData({ error: '', file: null, encoding: '', preview: '' })
 
     let picked
     try {
@@ -46,10 +48,19 @@ Page({
 
     try {
       const buffer = await readFileAsArrayBuffer(picked.path)
-      // Step 1 only: naive UTF-8 preview. Encoding detection comes next,
-      // so GBK files will look garbled here for now.
-      const preview = ext === 'txt' ? naiveUtf8Preview(buffer) : '（epub 解析稍后支持）'
-      this.setData({ preview })
+      if (ext === 'epub') {
+        this.setData({ preview: '（epub 解析稍后支持）' })
+        return
+      }
+      const result = decodeText(buffer)
+      if (result.error) {
+        this.setData({ error: '无法识别这个文件的编码，请换成 UTF-8 或 GBK 编码的 txt' })
+        return
+      }
+      this.setData({
+        encoding: result.encoding,
+        preview: result.text.trim().slice(0, PREVIEW_CHARS)
+      })
     } catch (err) {
       this.setData({ error: '读取文件失败，请重试' })
     } finally {
@@ -58,33 +69,3 @@ Page({
   }
 })
 
-// Temporary: decode the first bytes as UTF-8 with replacement characters.
-function naiveUtf8Preview(buffer) {
-  const bytes = new Uint8Array(buffer, 0, Math.min(PREVIEW_BYTES, buffer.byteLength))
-  let out = ''
-  let i = 0
-  while (i < bytes.length) {
-    const b = bytes[i]
-    let len = b < 0x80 ? 1 : b >= 0xf8 ? 0 : b >= 0xf0 ? 4 : b >= 0xe0 ? 3 : b >= 0xc0 ? 2 : 0
-    if (len === 0 || i + len > bytes.length) {
-      out += '�'
-      i += 1
-      continue
-    }
-    let code = len === 1 ? b : b & (0xff >> (len + 1))
-    let ok = true
-    for (let k = 1; k < len; k++) {
-      const c = bytes[i + k]
-      if ((c & 0xc0) !== 0x80) { ok = false; break }
-      code = (code << 6) | (c & 0x3f)
-    }
-    if (!ok || code > 0x10ffff) {
-      out += '�'
-      i += 1
-      continue
-    }
-    out += String.fromCodePoint(code)
-    i += len
-  }
-  return out
-}

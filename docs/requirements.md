@@ -36,6 +36,7 @@ When the bookshelf is empty, show a short illustrated guide explaining how to ge
 | 6 | Duplicates | If a book with the same title and character count already exists, ask the user to overwrite or keep both. |
 | 7 | Deleting a book | Removes the text and reading progress. **Check-in history is kept**, so streaks are not affected. |
 | 8 | Batch import | Not supported in v1: one file per import. |
+| 9 | Cover image | EPUB: keep the cover image as the bookshelf thumbnail (other images are still dropped). Find it via the manifest item with `properties="cover-image"` (EPUB 3), then `<meta name="cover">` (EPUB 2), then the first image in the cover page. Save it under `wx.env.USER_DATA_PATH`, compressed if large. TXT books, and EPUBs without a cover, get a generated placeholder cover (title on a colored background; exact style decided in the design pass). |
 
 ### 1.5 Storage
 

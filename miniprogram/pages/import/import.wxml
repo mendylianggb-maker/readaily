@@ -12,7 +12,7 @@
 
   <view wx:if="{{file}}" class="card file-info">
     <view class="file-name">{{file.name}}</view>
-    <view class="text-secondary">{{file.ext}} · {{file.sizeText}}</view>
+    <view class="text-secondary">{{file.ext}} · {{file.sizeText}}<block wx:if="{{encoding}}"> · {{encoding}}</block></view>
   </view>
 
   <view wx:if="{{preview}}" class="card">
