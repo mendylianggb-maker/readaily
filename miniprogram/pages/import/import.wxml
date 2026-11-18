@@ -43,11 +43,9 @@
 
     <view wx:if="{{book.chapterCount}}" class="card">
       <view class="text-secondary">目录</view>
-      <block wx:for="{{chapterTitles}}" wx:key="index">
-        <view wx:if="{{showAllChapters || index < 8}}" class="chapter">{{item}}</view>
-      </block>
-      <view wx:if="{{chapterTitles.length > 8}}" class="toggle" bindtap="onToggleChapters">
-        {{showAllChapters ? '收起' : '展开全部 ' + chapterTitles.length + ' 章'}}
+      <view wx:for="{{chapterTitles}}" wx:key="index" class="chapter">{{item}}</view>
+      <view wx:if="{{book.chapterCount > chapterTitles.length}}" class="text-secondary more">
+        …… 共 {{book.chapterCount}} 章
       </view>
     </view>
     <view wx:else class="card text-secondary">

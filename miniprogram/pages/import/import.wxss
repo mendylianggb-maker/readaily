@@ -34,11 +34,8 @@
   font-size: 30rpx;
 }
 
-.toggle {
+.more {
   padding-top: 16rpx;
-  color: var(--color-primary);
-  text-align: center;
-  font-size: 28rpx;
 }
 
 .preview {

@@ -11,13 +11,13 @@ const { readingMinutes, formatAmount } = require('../../utils/text-stats')
 
 const PREVIEW_CHARS = 300
 const DEFAULT_DAILY_MINUTES = 10
+const CHAPTER_PREVIEW_COUNT = 5
 
 Page({
   data: {
     file: null, // { name, sizeText, ext }
     book: null, // summary shown on the confirmation card
-    chapterTitles: [],
-    showAllChapters: false,
+    chapterTitles: [], // first few chapter titles only
     preview: '',
     error: '',
     loading: false
@@ -30,7 +30,7 @@ Page({
   async onChooseFile() {
     this.parsed = null
     this.text = ''
-    this.setData({ error: '', file: null, book: null, chapterTitles: [], showAllChapters: false, preview: '' })
+    this.setData({ error: '', file: null, book: null, chapterTitles: [], preview: '' })
 
     let picked
     try {
@@ -98,7 +98,7 @@ Page({
         dailyMinutes: DEFAULT_DAILY_MINUTES,
         encoding
       },
-      chapterTitles: parsed.chapters.map((c) => c.title),
+      chapterTitles: parsed.chapters.slice(0, CHAPTER_PREVIEW_COUNT).map((c) => c.title),
       preview: text.slice(first.start, first.start + PREVIEW_CHARS).trim()
     })
   },
@@ -109,10 +109,6 @@ Page({
 
   onAuthorInput(e) {
     this.setData({ 'book.author': e.detail.value })
-  },
-
-  onToggleChapters() {
-    this.setData({ showAllChapters: !this.data.showAllChapters })
   },
 
   onConfirm() {
