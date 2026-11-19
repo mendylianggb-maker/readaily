@@ -228,3 +228,17 @@ The home page shows a Mon–Sun row with this week's marks, so the user sees pro
   - 又读完一本。挑个小礼物送给认真读书的自己。
 - The book moves to "Finished" on the bookshelf. A finished book can be **read again**: a fresh plan from day 1. A confirmation warns that the previous round's records for this book (daily marks, on-time rate) are cleared and cannot be restored; global streak and total days are kept. Low priority.
 - Prompt to import or pick the next book (optional, not forced).
+
+---
+
+## 5. Backup and restore
+
+Data lives only on the phone, so it is lost when switching phones or deleting the mini program. Backup is on the settings page.
+
+- **Backup**: packs everything (books with their text and covers, plans, progress, check-ins, Time Bookmarks, settings) into one zip and sends it to a WeChat chat with `wx.shareFileMessage`, e.g. File Transfer. File name: `日积月读备份-YYYY-MM-DD.zip`. The settings page shows the last backup time.
+- **Restore**: pick the zip from a chat (`wx.chooseMessageFile`). A confirmation shows the backup time and book count, and warns that everything on this phone is replaced. Then the app reopens on the home page.
+- Restoring is all-or-nothing: files are written to a staging folder first, and on any failure the old data is put back.
+- Dev-tool settings (simulated date, unlock) are neither backed up nor overwritten.
+- The backup contains book text, so the note on the page says to send it only to yourself.
+- Not in v1: merging a backup with existing data, automatic or scheduled backups.
+

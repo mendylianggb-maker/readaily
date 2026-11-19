@@ -1,4 +1,6 @@
 const library = require('../../utils/library')
+const backup = require('../../utils/backup')
+const { readFileAsArrayBuffer } = require('../../utils/file')
 const plans = require('../../utils/plan')
 const reading = require('../../utils/reading')
 const {
@@ -14,7 +16,8 @@ Page({
     minuteOptions: MINUTE_OPTIONS,
     plan: null, // { title, dailyMinutes }
     dev: null, // { todayLabel, offset } when dev tools are enabled
-    versionText: ''
+    versionText: '',
+    lastBackup: ''
   },
 
   versionTaps: 0,
@@ -25,7 +28,8 @@ Page({
     this.setData({
       plan: plan ? { title: library.getBook(bookId).title, dailyMinutes: plan.dailyMinutes } : null,
       dev: devToolsEnabled() ? { todayLabel: shortLabel(todayKey()), offset: getDayOffset() } : null,
-      versionText: versionText()
+      versionText: versionText(),
+      lastBackup: backup.lastBackupTime() ? formatTime(backup.lastBackupTime()) : ''
     })
   },
 
@@ -43,6 +47,84 @@ Page({
     wx.hideLoading()
     this.setData({ 'plan.dailyMinutes': minutes })
     wx.showToast({ title: '已修改', icon: 'success' })
+  },
+
+  // --- Backup and restore ---
+  // Kept synchronous up to shareFileMessage, which needs the tap that started it.
+  onBackup() {
+    if (!wx.shareFileMessage) {
+      wx.showModal({ title: '微信版本太旧', content: '请把微信更新到最新版本后再备份。', showCancel: false })
+      return
+    }
+    const fs = wx.getFileSystemManager()
+    const dir = wx.env.USER_DATA_PATH + '/backup'
+    const filePath = dir + '/readaily-backup.zip'
+    wx.showLoading({ title: '正在打包', mask: true })
+    try {
+      const { data } = backup.createBackup()
+      fs.mkdirSync(dir, true)
+      fs.writeFileSync(filePath, data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength))
+    } catch (err) {
+      console.error(err)
+      wx.hideLoading()
+      wx.showModal({ title: '备份失败', content: '手机存储空间可能不够了。', showCancel: false })
+      return
+    }
+    wx.hideLoading()
+    wx.shareFileMessage({
+      filePath,
+      fileName: '日积月读备份-' + todayKey() + '.zip',
+      success: () => {
+        backup.markBackedUp()
+        this.onShow()
+        wx.showToast({ title: '已发送', icon: 'success' })
+      },
+      complete: () => {
+        try { fs.unlinkSync(filePath) } catch (err) { /* already gone */ }
+      }
+    })
+  },
+
+  async onRestore() {
+    let file
+    try {
+      file = await new Promise((resolve, reject) => wx.chooseMessageFile({
+        count: 1, type: 'file', extension: ['zip'],
+        success: (res) => resolve(res.tempFiles[0]), fail: reject
+      }))
+    } catch (err) {
+      return // Cancelled.
+    }
+    let found
+    wx.showLoading({ title: '正在读取', mask: true })
+    try {
+      found = backup.readBackup(await readFileAsArrayBuffer(file.path))
+    } catch (err) {
+      wx.hideLoading()
+      wx.showModal({ title: '无法恢复', content: err.message || '文件读取失败', showCancel: false })
+      return
+    }
+    wx.hideLoading()
+    const ok = await confirm(
+      '用这个备份替换现在的数据？',
+      '备份时间：' + formatTime(found.createdAt) + '，共 ' + found.bookCount + ' 本书。\n\n' +
+        '这台手机上现在的书、阅读计划、打卡记录和设置都会被替换，替换后不能撤销。',
+      '恢复'
+    )
+    if (!ok) return
+    wx.showLoading({ title: '正在恢复', mask: true })
+    try {
+      backup.restoreBackup(found)
+      backup.markBackedUp()
+    } catch (err) {
+      console.error(err)
+      wx.hideLoading()
+      wx.showModal({ title: '恢复失败', content: '手机存储空间可能不够了，清理后再试一次。', showCancel: false })
+      return
+    }
+    wx.hideLoading()
+    wx.showToast({ title: '已恢复', icon: 'success' })
+    setTimeout(() => wx.reLaunch({ url: '/pages/home/home' }), 800)
   },
 
   // --- Simulated date (develop/trial builds only) ---
@@ -81,6 +163,12 @@ Page({
     this.onShow()
   }
 })
+
+function formatTime(ms) {
+  const d = new Date(ms)
+  const pad = (n) => (n < 10 ? '0' + n : '' + n)
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes())
+}
 
 function versionText() {
   let version = ''

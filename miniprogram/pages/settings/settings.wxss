@@ -41,3 +41,32 @@
   font-size: 22rpx;
   padding: 32rpx 0 16rpx;
 }
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.backup-note {
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.backup-last {
+  font-size: 24rpx;
+  margin: 16rpx 0 24rpx;
+}
+
+.backup-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.backup-actions button {
+  flex: 1;
+  margin: 0;
+  height: 88rpx;
+  line-height: 84rpx;
+  font-size: 30rpx;
+  letter-spacing: 0;
+}

@@ -12,6 +12,16 @@
 
   <view class="card text-secondary">字号、行距、字体和背景，在阅读页右上角的「Aa」里调整。</view>
 
+  <view class="card">
+    <view class="card-title">备份与恢复</view>
+    <view class="text-secondary backup-note">把书、阅读计划、打卡记录和设置打包成一个文件，发到微信聊天里（比如「文件传输助手」）。换手机或删了小程序后，从聊天里选这个文件就能恢复。备份里有书的原文，只发给自己。</view>
+    <view class="text-secondary backup-last">{{lastBackup ? '上次备份：' + lastBackup : '还没有备份过'}}</view>
+    <view class="backup-actions">
+      <button class="btn-primary" bindtap="onBackup">备份到聊天</button>
+      <button class="btn-secondary" bindtap="onRestore">从聊天恢复</button>
+    </view>
+  </view>
+
   <view wx:if="{{dev}}" class="card dev">
     <view class="dev-title">🛠 开发者工具（正式版不会出现）</view>
     <view class="dev-today">
