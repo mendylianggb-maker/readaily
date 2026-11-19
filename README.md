@@ -15,13 +15,14 @@ See [docs/requirements.md](docs/requirements.md) for the full v1 requirements an
 
 ### Tests
 
-The scheduling, check-in, and reward logic runs in Node with a mocked `wx` and clock:
+The app logic runs in Node with a mocked `wx` and clock:
 
 ```sh
-node tests/sim.js
+node tests/run.js          # all tests
+node tests/run.js backup   # one file
 ```
 
-It simulates several weeks of use (missed days, catch-up, reading ahead, rescheduling, switching books, Time Bookmarks) and prints one line per check.
+See [tests/README.md](tests/README.md) for what each file covers.
 
 ## License
 

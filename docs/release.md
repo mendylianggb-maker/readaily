@@ -2,7 +2,7 @@
 
 ## Update the trial version
 
-1. Test in WeChat DevTools, run `node tests/sim.js`.
+1. Test in WeChat DevTools, run `node tests/run.js`.
 2. DevTools → **Upload**. Version: bump it (`0.1.0` → `0.1.1`; new features → `0.2.0`). Note: one line on what changed.
 3. mp.weixin.qq.com → **Management → Version Management** → the new development version → **Set as trial version**. Page path: leave `pages/home/home`.
 4. Done. Trial users don't rescan; they get the new version on the next launch (fully close the mini program if it still shows the old one).
