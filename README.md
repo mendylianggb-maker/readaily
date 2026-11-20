@@ -27,3 +27,5 @@ See [tests/README.md](tests/README.md) for what each file covers.
 ## License
 
 MIT
+
+The offline dictionary (`miniprogram/dict1`-`dict3`) is generated from [ECDICT](https://github.com/skywind3000/ECDICT), MIT licensed; see [licenses/ECDICT-LICENSE](licenses/ECDICT-LICENSE). To rebuild it, download `ecdict.csv` from that repository and run `node scripts/build-dict.js path/to/ecdict.csv`.
