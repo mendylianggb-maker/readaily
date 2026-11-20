@@ -6,6 +6,10 @@ const path = require('path')
 const { parsePart, lookup, DICT_PARTS } = require('../miniprogram/utils/dict')
 
 const RANK_LIMIT = 60000 // keep words within the 60,000 most frequent (COCA or BNC)
+// Words a CET-6 reader is assumed to know: exam word lists, or the most frequent ones.
+// Everything else is marked rare and gets a light underline in the reader.
+const COMMON_TAGS = ['zk', 'gk', 'cet4', 'cet6']
+const COMMON_RANK = 8000
 const MAX_DEFS = 3
 const MAX_DEF_CHARS = 40
 const PART_LIMIT = 1.9 * 1024 * 1024 // subpackages must stay under 2 MB
@@ -32,6 +36,20 @@ function parseCsv(text) {
 }
 
 const isSimple = (w) => /^[a-z][a-z'-]*$/.test(w)
+
+function isCommon(r) {
+  if (!r) return false
+  const frq = Number(r.frq) || 0
+  const bnc = Number(r.bnc) || 0
+  return r.tag.split(' ').some((t) => COMMON_TAGS.includes(t)) || (frq > 0 && frq <= COMMON_RANK) || (bnc > 0 && bnc <= COMMON_RANK)
+}
+
+/** Rare unless the word or its base form is common (was -> be, glistened -> glisten). */
+function isRare(r, byWord, candidates) {
+  const base = /(?:^|\/)0:([a-z][a-z'-]*)/.exec(r.exchange)
+  const lemma = candidates.get(r.word)
+  return !isCommon(r) && !(base && isCommon(byWord.get(base[1]))) && !(lemma && isCommon(byWord.get(lemma[0])))
+}
 
 function keep(r) {
   const frq = Number(r.frq) || 0
@@ -88,9 +106,11 @@ function build(csvPath) {
     const t = /(?:^|\/)1:([a-z0-9]+)/.exec(r.exchange)
     if (m && isSimple(r.word) && words.has(m[1]) && !candidates.has(r.word)) candidates.set(r.word, [m[1], t ? t[1][0] : ''])
   })
+  words.forEach((e, w) => { e.rare = isRare(byWord.get(w), byWord, candidates) })
+
   // Keep forms the stemming rules get wrong, and forms that are words of their
   // own unless the definition already names the base word ("think的过去式").
-  const wordLines = [...words].map(([w, e]) => w + '\t' + e.phonetic + '\t' + e.defs.join('|'))
+  const wordLines = [...words].map(([w, e]) => w + '\t' + e.phonetic + '\t' + e.defs.join('|') + (e.rare ? '\t1' : ''))
   const plain = parsePart({ words: wordLines.join('\n'), forms: '' })
   const forms = [...candidates].filter(([form, [lemma]]) => {
     if (words.has(form)) return !words.get(form).defs.join(' ').includes(lemma)
@@ -120,7 +140,7 @@ function build(csvPath) {
     fs.writeFileSync(path.join(dir, 'data.js'), js)
     console.log('dict' + (i + 1), p.words.length, 'words', p.forms.length, 'forms', (bytes / 1024 / 1024).toFixed(2) + ' MB')
   })
-  console.log('total', words.size, 'words', forms.length, 'irregular forms')
+  console.log('total', words.size, 'words,', [...words.values()].filter((e) => e.rare).length, 'rare,', forms.length, 'irregular forms')
 }
 
 build(process.argv[2])

@@ -9,6 +9,7 @@ const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
 const dict = require('../../utils/dict')
 
 const SAVE_SCROLL_MS = 1000
+const LONG_PRESS_MS = 350 // a longer touch is the system's text selection, not a lookup
 
 Page({
   data: {
@@ -151,18 +152,33 @@ Page({
   },
 
   // --- Dictionary (English books) ---
-  // Paragraphs are split into word tokens; the dictionary loads in the background.
+  // Paragraphs are split into word tokens; the dictionary loads in the background,
+  // then words beyond CET-6 get a light underline.
   enableLookup(book, blocks) {
     if (book.language !== 'en') return
     blocks.forEach((b) => {
       if (b.type === 'p') b.tokens = dict.tokenize(b.text).map((x) => (x.w ? { t: x.t, w: 1 } : { t: x.t }))
     })
-    dict.loadDict().catch((err) => console.error(err))
+    dict.loadDict()
+      .then((d) => {
+        const paths = dict.rarePaths(d, this.data.blocks)
+        if (Object.keys(paths).length) this.setData(paths)
+      })
+      .catch((err) => console.error(err))
   },
 
   lookupSeq: 0,
+  touchStartAt: 0,
+
+  onParaTouch(e) {
+    this.touchStartAt = e.timeStamp
+  },
 
   onWordTap(e) {
+    // Long press selects text; the tap that follows it should not open the dictionary.
+    const held = this.touchStartAt ? e.timeStamp - this.touchStartAt : 0
+    this.touchStartAt = 0
+    if (held > LONG_PRESS_MS) return
     const p = Number(e.currentTarget.dataset.p)
     const t = Number(e.target.dataset.t)
     const block = this.data.blocks[p]

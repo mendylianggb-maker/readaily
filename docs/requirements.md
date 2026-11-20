@@ -179,6 +179,8 @@ Tap a word in an English book to see its Chinese meaning. Fully offline: no serv
 - **Data**: ECDICT (MIT), trimmed by `scripts/build-dict.js` to about 50,000 common words (within the top 60,000 by COCA/BNC frequency, or tagged by exam lists, Oxford 3000 or Collins), with up to 3 short definitions each and a phonetic. About 2.9 MB, split into 3 subpackages (`dict1`-`dict3`, each under the 2 MB limit). They download in the background when an English book is opened.
 - **Base forms**: rules for regular endings (-s, -ies, -ed, -ing, -er, -est, -ly), plus a list of irregular forms (went → go, mice → mouse). When a word is also a form of another (saw, left, felt), the card links to the base word: "也是 see 的过去式 ›".
 - **Card**: word, phonetic, definitions; "原文是 went" when the entry differs from the tapped word; "词典里没有收录这个词" for names and rare words. The tapped word is highlighted. Tapping outside closes the card.
+- **Tap vs. long press**: a tap opens the card; a touch held longer than 350 ms is left to the system's text selection (select a word or a paragraph), so no card opens.
+- **Rare words**: words a CET-6 reader may not know get a light dotted underline. A word is common if it, or its base form, is on the zk/gk/CET-4/CET-6 lists or within the 8,000 most frequent words; everything else in the dictionary is rare. Capitalized words in mid-sentence (usually names) are not marked. Marks appear once the dictionary has loaded.
 - **Only English books** (`language: 'en'`): their paragraphs are rendered word by word; English paragraphs are left-aligned, since justified text leaves wide gaps on a phone.
 - Not in v1: a word list (生词本), English-English definitions, pronunciation audio.
 

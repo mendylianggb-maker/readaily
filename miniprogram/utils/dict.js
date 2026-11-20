@@ -3,7 +3,7 @@
 // into subpackages dict1, dict2, ... (each under the 2 MB subpackage limit).
 //
 // Each part exports { words, forms }:
-//   words: "word\tphonetic\tdef1|def2\n..."  (definitions joined by "|")
+//   words: "word\tphonetic\tdef1|def2[\t1]\n..."  (definitions joined by "|"; 1 = rare)
 //   forms: "went\tgo\tp\n..."                (form, lemma, type: see FORM_TYPES)
 // Forms are listed when the stemming rules below would miss them (went, mice),
 // or when the form is a word of its own (saw = a tool, and the past of see).
@@ -37,8 +37,8 @@ function parsePart(part, into) {
   const dict = into || { words: new Map(), forms: new Map() }
   part.words.split('\n').forEach((line) => {
     if (!line) return
-    const [word, phonetic, defs] = line.split('\t')
-    dict.words.set(word, { phonetic, defs: defs ? defs.split('|') : [] })
+    const [word, phonetic, defs, rare] = line.split('\t')
+    dict.words.set(word, { phonetic, defs: defs ? defs.split('|') : [], rare: rare === '1' })
   })
   part.forms.split('\n').forEach((line) => {
     if (!line) return
@@ -131,6 +131,45 @@ function find(dict, w) {
   return null
 }
 
+const ABBREVIATIONS = /^(Mr|Mrs|Ms|Dr|St|Mt|Jr|Sr|Prof|Capt|Col|Gen|Lt|Rev|No|vs|etc)$/
+
+/**
+ * Whether a word in running text should be marked as rare (beyond CET-6).
+ * Capitalized words are skipped unless they start a sentence: they are
+ * usually names, which the dictionary may list as ordinary words (Bennet).
+ */
+function isRareWord(dict, raw, startsSentence) {
+  if (/^[A-Z]/.test(raw) && !startsSentence) return false
+  const hit = lookup(dict, raw)
+  if (!hit || !hit.rare) return false
+  const base = hit.also && dict.words.get(hit.also.word)
+  if (base && !base.rare) return false
+  // impatiently -> impatient: a common base form makes it common too.
+  return !stems(normalize(raw).toLowerCase()).some((x) => dict.words.has(x) && !dict.words.get(x).rare)
+}
+
+/**
+ * Mark rare words in tokenized paragraphs. Returns setData paths, e.g.
+ * { "blocks[3].tokens[17].r": 1 }, so only those tokens re-render.
+ */
+function rarePaths(dict, blocks) {
+  const paths = {}
+  blocks.forEach((b, bi) => {
+    if (!b.tokens) return
+    let sentenceStart = true
+    b.tokens.forEach((tk, ti) => {
+      if (tk.w) {
+        if (isRareWord(dict, tk.t, sentenceStart)) paths['blocks[' + bi + '].tokens[' + ti + '].r'] = 1
+        sentenceStart = false
+      } else if (/[.!?]["”’)]*\s*["“‘(]?\s*$|^\s*["“‘(]\s*$/.test(tk.t)) {
+        const prev = ti > 0 ? b.tokens[ti - 1].t : ''
+        sentenceStart = !(tk.t.trim() === '.' && ABBREVIATIONS.test(prev)) // "Mr. Bennet" is not a new sentence
+      }
+    })
+  })
+  return paths
+}
+
 // --- Loading in the mini program (data lives in subpackages) ---
 
 let loaded = null
@@ -157,4 +196,4 @@ function loadDict() {
   return loaded
 }
 
-module.exports = { DICT_PARTS, FORM_TYPES, tokenize, parsePart, stems, normalize, lookup, loadDict }
+module.exports = { DICT_PARTS, FORM_TYPES, tokenize, isRareWord, rarePaths, parsePart, stems, normalize, lookup, loadDict }

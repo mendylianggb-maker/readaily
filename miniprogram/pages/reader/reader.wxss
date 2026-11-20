@@ -193,6 +193,13 @@
 }
 
 /* Dictionary */
+.rare {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--rare);
+  text-decoration-thickness: 2rpx;
+  text-underline-offset: 0.22em;
+}
+
 .w-on {
   background: var(--highlight);
   border-radius: 6rpx;

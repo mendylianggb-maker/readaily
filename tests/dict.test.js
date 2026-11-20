@@ -39,6 +39,20 @@ check('saw: a tool, and the past tense of see', look('saw').word === 'saw' && lo
 check('left: also the past tense and participle of leave', look('left').also.word === 'leave' && look('left').also.kind === '过去式和过去分词')
 check('no "also" when the definition already says it', look('thought').also === null)
 
+section('Marking words beyond CET-6')
+const rareIn = (text) => {
+  const blocks = [{ type: 'p', tokens: dict.tokenize(text) }]
+  return Object.keys(dict.rarePaths(data, blocks)).map((k) => blocks[0].tokens[Number(/tokens\[(\d+)/.exec(k)[1])].t)
+}
+check('rare words are marked', rareIn('He scowled, brandishing the cudgel with trepidation.').join() === 'scowled,brandishing,cudgel,trepidation')
+check('everyday and exam-list words are not', rareIn('It is a truth universally acknowledged that she was nervous and discontented.').length === 0)
+check('a common base form makes its forms common (was -> be)', !dict.isRareWord(data, 'was', false) && !dict.isRareWord(data, 'went', false))
+check('a common stem makes a derived word common (impatiently)', !dict.isRareWord(data, 'impatiently', false))
+check('names in mid-sentence are skipped', rareIn('He met Bennet and Darcy.').length === 0)
+check('"Mr." does not start a new sentence', rareIn('Then Mr. Bennet left.').length === 0)
+check('a capitalized rare word at sentence start is marked', rareIn('He paused. “Trepidation,” she said.').join() === 'Trepidation')
+check('a paths object updates only the rare tokens', Object.keys(dict.rarePaths(data, [{ type: 'h' }, { type: 'p', tokens: dict.tokenize('A cudgel.') }]))[0] === 'blocks[1].tokens[2].r')
+
 section('Built data')
 const sizes = parts.map((p) => fs.statSync(p).size)
 check('each part is under the 2 MB subpackage limit', sizes.every((s) => s < 2 * 1024 * 1024))

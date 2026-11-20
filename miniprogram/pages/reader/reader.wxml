@@ -1,7 +1,7 @@
 <view
   wx:if="{{loaded}}"
   class="reader"
-  style="background: {{style.theme.bg}}; color: {{style.theme.text}}; font-size: {{style.fontSize}}rpx; line-height: {{style.lineHeight}}; font-family: {{style.fontFamily}}; --highlight: {{style.theme.highlight}};"
+  style="background: {{style.theme.bg}}; color: {{style.theme.text}}; font-size: {{style.fontSize}}rpx; line-height: {{style.lineHeight}}; font-family: {{style.fontFamily}}; --highlight: {{style.theme.highlight}}; --rare: {{style.theme.rare}};"
 >
   <view class="header" style="color: {{style.theme.secondary}}">
     <view class="header-row">
@@ -25,7 +25,7 @@
         <text>{{item.text}}</text>
         <view class="chapter-rule" style="background: {{style.theme.secondary}}"></view>
       </view>
-      <view wx:elif="{{item.tokens}}" class="para"><text class="para-text" user-select data-p="{{index}}" bindtap="onWordTap"><text wx:for="{{item.tokens}}" wx:for-item="tk" wx:for-index="ti" wx:key="ti" class="{{word && word.p === index && word.t === ti ? 'w-on' : ''}}" data-t="{{ti}}">{{tk.t}}</text></text></view>
+      <view wx:elif="{{item.tokens}}" class="para"><text class="para-text" user-select data-p="{{index}}" bindtouchstart="onParaTouch" bindtap="onWordTap"><text wx:for="{{item.tokens}}" wx:for-item="tk" wx:for-index="ti" wx:key="ti" class="{{tk.r ? 'rare' : ''}} {{word && word.p === index && word.t === ti ? 'w-on' : ''}}" data-t="{{ti}}">{{tk.t}}</text></text></view>
       <view wx:else class="para {{indent ? 'cjk' : ''}}"><text class="para-text" user-select>{{item.text}}</text></view>
     </block>
   </view>
