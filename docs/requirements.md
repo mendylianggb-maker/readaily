@@ -172,6 +172,16 @@ Custom fonts are out of scope for v1. A full CJK font is several MB, too large f
 
 Highlights, notes, bookmarks, text-to-speech, full-text search, horizontal paging, custom fonts.
 
+### 3.6 Dictionary (English books)
+
+Tap a word in an English book to see its Chinese meaning. Fully offline: no server, no API key.
+
+- **Data**: ECDICT (MIT), trimmed by `scripts/build-dict.js` to about 50,000 common words (within the top 60,000 by COCA/BNC frequency, or tagged by exam lists, Oxford 3000 or Collins), with up to 3 short definitions each and a phonetic. About 2.9 MB, split into 3 subpackages (`dict1`-`dict3`, each under the 2 MB limit). They download in the background when an English book is opened.
+- **Base forms**: rules for regular endings (-s, -ies, -ed, -ing, -er, -est, -ly), plus a list of irregular forms (went → go, mice → mouse). When a word is also a form of another (saw, left, felt), the card links to the base word: "也是 see 的过去式 ›".
+- **Card**: word, phonetic, definitions; "原文是 went" when the entry differs from the tapped word; "词典里没有收录这个词" for names and rare words. The tapped word is highlighted. Tapping outside closes the card.
+- **Only English books** (`language: 'en'`): their paragraphs are rendered word by word; English paragraphs are left-aligned, since justified text leaves wide gaps on a phone.
+- Not in v1: a word list (生词本), English-English definitions, pronunciation audio.
+
 ## 4. Check-in calendar
 
 ### 4.1 Scope

@@ -66,6 +66,10 @@
   word-wrap: break-word;
 }
 
+.para:not(.cjk) {
+  text-align: left; /* justified English leaves wide gaps on a narrow screen */
+}
+
 .para.cjk {
   word-break: break-all; /* Chinese text: wrap anywhere, never scroll sideways */
 }
@@ -186,4 +190,63 @@
    ideographic spaces in the text instead (see buildBlocks). */
 .para-text {
   display: block;
+}
+
+/* Dictionary */
+.w-on {
+  background: var(--highlight);
+  border-radius: 6rpx;
+}
+
+.mask.clear {
+  background: transparent;
+}
+
+.word-sheet {
+  box-shadow: 0 -8rpx 32rpx rgba(43, 38, 32, 0.16);
+  padding-bottom: 64rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.word-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.word-title {
+  font-family: var(--font-serif);
+  font-size: 48rpx;
+  font-weight: 700;
+}
+
+.word-phonetic {
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+.word-note {
+  color: var(--color-text-secondary);
+  font-size: 26rpx;
+  margin-bottom: 12rpx;
+}
+
+.word-def {
+  margin-top: 8rpx;
+}
+
+.word-also {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+.word-link {
+  color: var(--color-primary);
+  font-weight: 600;
 }

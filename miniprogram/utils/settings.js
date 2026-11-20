@@ -6,11 +6,12 @@ const FONTS = {
   sans: '-apple-system, "PingFang SC", "Helvetica Neue", Roboto, sans-serif',
   serif: 'Georgia, "Times New Roman", "Songti SC", "STSong", "Noto Serif CJK SC", serif'
 }
+// highlight: background of the word being looked up.
 // "paper" matches the app's own background; "auto" uses paper by day and dark at night.
 const THEMES = {
-  paper: { bg: '#F6F1E7', text: '#2B2620', secondary: '#7A6F62', line: '#E6DDCD', accent: '#3E6B4E', nav: '#F6F1E7', navText: '#000000' },
-  light: { bg: '#FFFFFF', text: '#222222', secondary: '#8A8A8A', line: '#EEEEEE', accent: '#3E6B4E', nav: '#FFFFFF', navText: '#000000' },
-  dark: { bg: '#1E1C1A', text: '#CFC8BC', secondary: '#8A8378', line: '#3A3632', accent: '#7FA88B', nav: '#1E1C1A', navText: '#ffffff' }
+  paper: { bg: '#F6F1E7', text: '#2B2620', secondary: '#7A6F62', line: '#E6DDCD', accent: '#3E6B4E', highlight: 'rgba(62, 107, 78, 0.22)', nav: '#F6F1E7', navText: '#000000' },
+  light: { bg: '#FFFFFF', text: '#222222', secondary: '#8A8A8A', line: '#EEEEEE', accent: '#3E6B4E', highlight: 'rgba(62, 107, 78, 0.2)', nav: '#FFFFFF', navText: '#000000' },
+  dark: { bg: '#1E1C1A', text: '#CFC8BC', secondary: '#8A8378', line: '#3A3632', accent: '#7FA88B', highlight: 'rgba(226, 179, 84, 0.38)', nav: '#1E1C1A', navText: '#ffffff' }
 }
 
 const DEFAULTS = { fontSize: 1, lineHeight: 1, font: 'serif', theme: 'auto' }

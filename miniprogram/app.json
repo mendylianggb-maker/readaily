@@ -9,6 +9,11 @@
     "pages/finish/finish",
     "pages/extras/extras"
   ],
+  "subpackages": [
+    { "root": "dict1", "pages": [] },
+    { "root": "dict2", "pages": [] },
+    { "root": "dict3", "pages": [] }
+  ],
   "window": {
     "navigationBarTitleText": "日积月读",
     "navigationBarBackgroundColor": "#F6F1E7",

@@ -6,6 +6,7 @@ const { FONTS, loadSettings, saveSettings, readerStyle } = require('../../utils/
 const { todayKey, shortLabel } = require('../../utils/dates')
 const { countUnits, readingMinutes } = require('../../utils/text-stats')
 const { BOOKMARK_EXPLAINER } = require('../../utils/ui')
+const dict = require('../../utils/dict')
 
 const SAVE_SCROLL_MS = 1000
 
@@ -14,7 +15,8 @@ Page({
     loaded: false,
     indent: true, // first-line indent for Chinese text
     header: null, // { dateText, dayText, minutes, label, progress } or { title } for extras
-    blocks: [], // { type: 'h' | 'p', text }
+    blocks: [], // { type: 'h' | 'p', text, tokens? } (tokens: English books, for tap-to-look-up)
+    word: null, // dictionary sheet: { p, t, raw, state: loading | found | missing | error, entry }
     mode: 'read', // read | reread | extra
     finishText: '',
     settings: null,
@@ -88,6 +90,7 @@ Page({
 
     const indent = book.language !== 'en'
     const blocks = buildBlocks(text, chapters, session, indent)
+    this.enableLookup(book, blocks)
     wx.setNavigationBarTitle({ title: book.title })
     this.setData({
       loaded: true,
@@ -120,12 +123,14 @@ Page({
     const extra = detail && detail.extras && detail.extras[i]
     if (!book || !extra) return this.fail()
     const text = library.readExtrasText(this.bookId).slice(extra.start, extra.end)
+    const blocks = text.split('\n').map((t) => t.trim()).filter(Boolean).map((t) => ({ type: 'p', text: t }))
+    this.enableLookup(book, blocks)
     wx.setNavigationBarTitle({ title: book.title })
     this.setData({
       loaded: true,
       mode: 'extra',
       header: { title: extra.title },
-      blocks: text.split('\n').map((t) => t.trim()).filter(Boolean).map((t) => ({ type: 'p', text: t }))
+      blocks
     })
   },
 
@@ -143,6 +148,49 @@ Page({
     if (now - this.lastScrollSave < SAVE_SCROLL_MS) return
     this.lastScrollSave = now
     wx.setStorageSync('progress:' + this.bookId, { index: this.index, top: e.scrollTop })
+  },
+
+  // --- Dictionary (English books) ---
+  // Paragraphs are split into word tokens; the dictionary loads in the background.
+  enableLookup(book, blocks) {
+    if (book.language !== 'en') return
+    blocks.forEach((b) => {
+      if (b.type === 'p') b.tokens = dict.tokenize(b.text).map((x) => (x.w ? { t: x.t, w: 1 } : { t: x.t }))
+    })
+    dict.loadDict().catch((err) => console.error(err))
+  },
+
+  lookupSeq: 0,
+
+  onWordTap(e) {
+    const p = Number(e.currentTarget.dataset.p)
+    const t = Number(e.target.dataset.t)
+    const block = this.data.blocks[p]
+    const token = block && block.tokens && block.tokens[t]
+    if (!token || !token.w) return
+    this.showWord(token.t, p, t)
+  },
+
+  onWordAlso() {
+    const { also } = this.data.word.entry
+    this.showWord(also.word, this.data.word.p, this.data.word.t)
+  },
+
+  showWord(raw, p, t) {
+    const seq = ++this.lookupSeq
+    this.setData({ word: { p, t, raw, state: 'loading', entry: null } })
+    dict.loadDict().then((d) => {
+      if (seq !== this.lookupSeq) return
+      const entry = dict.lookup(d, raw)
+      this.setData({ word: { p, t, raw, state: entry ? 'found' : 'missing', entry } })
+    }).catch(() => {
+      if (seq === this.lookupSeq) this.setData({ 'word.state': 'error' })
+    })
+  },
+
+  onWordClose() {
+    this.lookupSeq++
+    this.setData({ word: null })
   },
 
   // --- Aa panel ---

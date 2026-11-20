@@ -1,0 +1,48 @@
+// Offline dictionary: tokenizing paragraphs, finding base forms, and the built data.
+const fs = require('fs')
+const path = require('path')
+const { load, section, check } = require('./harness')
+const dict = load('dict')
+
+const ROOT = path.join(__dirname, '..', 'miniprogram')
+const parts = [1, 2, 3].map((i) => path.join(ROOT, 'dict' + i, 'data.js'))
+const data = { words: new Map(), forms: new Map() }
+parts.forEach((p) => dict.parsePart(require(p), data))
+const look = (w) => dict.lookup(data, w)
+
+section('Splitting paragraphs into words')
+const para = '“My dear Mr. Bennet,” said his lady — don’t you know the well-known story?'
+const tokens = dict.tokenize(para)
+check('joining the tokens gives back the paragraph', tokens.map((t) => t.t).join('') === para)
+check('words are marked, punctuation is not', tokens.filter((t) => t.w).map((t) => t.t).join(' ') === 'My dear Mr Bennet said his lady don’t you know the well-known story')
+check('Chinese text has no words to tap', dict.tokenize('他说：好的。').every((t) => !t.w))
+
+section('Finding the dictionary form')
+check('plain word', look('bank').word === 'bank' && look('bank').defs[0].includes('银行'))
+check('capitalized at sentence start', look('The').word === 'the')
+check('plural -s', look('rooms').word === 'room')
+check('plural -ies: rule finds the base form', dict.stems('families')[0] === 'family')
+check('plural -ies: entry or its definition leads to family', look('families').word === 'family' || look('families').defs.join().includes('family'))
+check('past tense with doubled consonant', look('nodded').word === 'nod')
+check('past tense dropping e', look('smiled').word === 'smile')
+check('-ing dropping e', look('hoping').word === 'hope')
+check('comparative -ier', look('happier').word === 'happy')
+check('irregular past from the forms list', look('went').word === 'go' && look('went').from === 'went')
+check('irregular plural from the forms list', look('mice').word === 'mouse')
+check('possessive \'s is dropped', look('father’s').word === 'father')
+check('hyphenated word as a whole', look('well-known').word === 'well-known')
+check('hyphenated word falls back to a part', look('sea-captain') !== null)
+check('unknown word returns null', look('Netherfield') === null && look('qwzx') === null)
+
+section('Words that are also forms of another word')
+check('saw: a tool, and the past tense of see', look('saw').word === 'saw' && look('saw').also.word === 'see' && look('saw').also.kind === '过去式')
+check('left: also the past tense and participle of leave', look('left').also.word === 'leave' && look('left').also.kind === '过去式和过去分词')
+check('no "also" when the definition already says it', look('thought').also === null)
+
+section('Built data')
+const sizes = parts.map((p) => fs.statSync(p).size)
+check('each part is under the 2 MB subpackage limit', sizes.every((s) => s < 2 * 1024 * 1024))
+check('about 50,000 words', data.words.size > 45000)
+check('no ECDICT stand-in characters left in phonetics', [...data.words.values()].every((e) => !/[\\^әє]/.test(e.phonetic)))
+check('no stray escape sequences in definitions', [...data.words.values()].every((e) => e.defs.every((d) => !/\\[nr]/.test(d))))
+check('every form points to a word in the dictionary', [...data.forms.values()].every((f) => data.words.has(f.lemma)))

@@ -13,6 +13,7 @@ node tests/run.js streaks  # files whose name starts with "streaks"
 | `streaks.test.js` | Check-ins, streaks, pre-credits for reading ahead, Time Bookmark cards and their limit |
 | `library.test.js` | Bookshelf info line, duplicate detection, EPUB extras |
 | `devtools.test.js` | Simulated date in develop, trial (7-tap unlock) and release builds |
+| `dict.test.js` | Dictionary: splitting paragraphs into words, finding base forms, "also a form of", checks on the built data |
 | `backup.test.js` | Backup zip, restore, rollback on failure, rejecting other files |
 
 To add a test, create `<topic>.test.js`, require `./harness`, and group checks with `section()` and `check()`.

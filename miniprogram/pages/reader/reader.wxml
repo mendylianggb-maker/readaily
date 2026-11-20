@@ -1,7 +1,7 @@
 <view
   wx:if="{{loaded}}"
   class="reader"
-  style="background: {{style.theme.bg}}; color: {{style.theme.text}}; font-size: {{style.fontSize}}rpx; line-height: {{style.lineHeight}}; font-family: {{style.fontFamily}};"
+  style="background: {{style.theme.bg}}; color: {{style.theme.text}}; font-size: {{style.fontSize}}rpx; line-height: {{style.lineHeight}}; font-family: {{style.fontFamily}}; --highlight: {{style.theme.highlight}};"
 >
   <view class="header" style="color: {{style.theme.secondary}}">
     <view class="header-row">
@@ -25,6 +25,7 @@
         <text>{{item.text}}</text>
         <view class="chapter-rule" style="background: {{style.theme.secondary}}"></view>
       </view>
+      <view wx:elif="{{item.tokens}}" class="para"><text class="para-text" user-select data-p="{{index}}" bindtap="onWordTap"><text wx:for="{{item.tokens}}" wx:for-item="tk" wx:for-index="ti" wx:key="ti" class="{{word && word.p === index && word.t === ti ? 'w-on' : ''}}" data-t="{{ti}}">{{tk.t}}</text></text></view>
       <view wx:else class="para {{indent ? 'cjk' : ''}}"><text class="para-text" user-select>{{item.text}}</text></view>
     </block>
   </view>
@@ -62,6 +63,24 @@
         <text wx:for="{{themeOptions}}" wx:key="value" class="opt {{settings.theme === item.value ? 'on' : ''}}" data-value="{{item.value}}" bindtap="onTheme">{{item.label}}</text>
       </view>
     </view>
+  </view>
+</view>
+
+<!-- Dictionary: tap a word in an English book -->
+<view wx:if="{{word}}" class="mask clear" bindtap="onWordClose">
+  <view class="sheet word-sheet" catchtap="noop">
+    <view class="word-head">
+      <text class="word-title">{{word.entry ? word.entry.word : word.raw}}</text>
+      <text wx:if="{{word.entry && word.entry.phonetic}}" class="word-phonetic">/{{word.entry.phonetic}}/</text>
+    </view>
+    <view wx:if="{{word.entry && word.entry.from}}" class="word-note">原文是 {{word.entry.from}}</view>
+    <view wx:if="{{word.state === 'loading'}}" class="word-note">正在加载词典…</view>
+    <view wx:elif="{{word.state === 'error'}}" class="word-note">词典加载失败，请检查网络后再点一次。</view>
+    <view wx:elif="{{word.state === 'missing'}}" class="word-note">词典里没有收录这个词。</view>
+    <view wx:else class="word-defs">
+      <view wx:for="{{word.entry.defs}}" wx:key="index" class="word-def">{{item}}</view>
+    </view>
+    <view wx:if="{{word.entry && word.entry.also}}" class="word-also" bindtap="onWordAlso">也是 <text class="word-link">{{word.entry.also.word}}</text> 的{{word.entry.also.kind}} ›</view>
   </view>
 </view>
 
