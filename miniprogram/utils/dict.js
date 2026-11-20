@@ -131,21 +131,70 @@ function find(dict, w) {
   return null
 }
 
-const ABBREVIATIONS = /^(Mr|Mrs|Ms|Dr|St|Mt|Jr|Sr|Prof|Capt|Col|Gen|Lt|Rev|No|vs|etc)$/
+// Affixes that rarely make a word harder than its base: unseen, realness, lovable.
+const PREFIXES = ['un', 're', 'dis', 'non', 'over', 'under', 'mis', 'out', 'pre', 'inter', 'self', 'im', 'in']
+const SUFFIXES = [
+  ['ness', ''], ['ful', ''], ['less', ''], ['ment', ''], ['ism', ''], ['ist', ''], ['ity', ''], ['ity', 'e'],
+  ['able', ''], ['able', 'e'], ['ible', ''], ['ally', ''], ['ly', ''], ['ive', ''], ['ive', 'e'], ['al', ''],
+  ['ize', ''], ['ise', ''], ['ish', ''], ['ship', ''], ['hood', ''], ['ation', ''], ['ation', 'e'], ['iness', 'y']
+]
+// Second halves that commonly form compounds with a short first half (bed + time).
+const COMPOUND_TAILS = new Set(['time', 'box', 'down', 'up', 'out', 'off', 'over', 'back', 'care', 'set', 'work', 'room', 'house',
+  'day', 'night', 'side', 'way', 'where', 'thing', 'body', 'one', 'place', 'ball', 'book', 'line', 'light', 'land', 'yard', 'wear'])
+const ROMAN = /^[ivxlcdm]+$/i
+
+/** A known word that a CET-6 reader is expected to know (directly, or as a form of one). */
+function isKnown(dict, w) {
+  const hit = find(dict, w)
+  if (!hit) return false
+  if (!hit.rare) return true
+  const base = hit.also && dict.words.get(hit.also.word)
+  if (base && !base.rare) return true
+  return stems(w).some((x) => dict.words.has(x) && !dict.words.get(x).rare) // impatiently -> impatient
+}
+
+/** Same, also accepting words built from known parts: unseen, playfulness, bedtime. */
+function isEasy(dict, w, depth) {
+  if (isKnown(dict, w)) return true
+  if (depth >= 2) return false
+  for (const p of PREFIXES) {
+    if (w.startsWith(p) && w.length - p.length >= 3 && isEasy(dict, w.slice(p.length), depth + 1)) return true
+  }
+  for (const [suffix, add] of SUFFIXES) {
+    if (w.endsWith(suffix) && w.length - suffix.length >= 3 && isEasy(dict, w.slice(0, -suffix.length) + add, depth + 1)) return true
+  }
+  // Compounds of two common words: bedtime, toolbox, meltdown. Both parts must be
+  // entries (or listed forms) themselves, so "bran" + "dishing" does not count,
+  // and a short first part needs a typical tail, so "cap" + "rice" does not either.
+  const direct = (x) => {
+    const e = dict.words.get(x) || (dict.forms.has(x) && dict.words.get(dict.forms.get(x).lemma))
+    return !!e && !e.rare
+  }
+  for (let i = 3; i <= w.length - 3; i++) {
+    const head = w.slice(0, i)
+    const tail = w.slice(i)
+    if ((head.length >= 4 && tail.length >= 4) || COMPOUND_TAILS.has(tail)) {
+      if (direct(head) && direct(tail)) return true
+    }
+  }
+  return false
+}
 
 /**
  * Whether a word in running text should be marked as rare (beyond CET-6).
- * Capitalized words are skipped unless they start a sentence: they are
- * usually names, which the dictionary may list as ordinary words (Bennet).
+ * Not marked: capitalized words (mostly names, which the dictionary may list
+ * as ordinary words), contractions (you're), roman numerals, hyphenated words
+ * made of common parts, and words built from common parts.
  */
-function isRareWord(dict, raw, startsSentence) {
-  if (/^[A-Z]/.test(raw) && !startsSentence) return false
-  const hit = lookup(dict, raw)
-  if (!hit || !hit.rare) return false
-  const base = hit.also && dict.words.get(hit.also.word)
-  if (base && !base.rare) return false
-  // impatiently -> impatient: a common base form makes it common too.
-  return !stems(normalize(raw).toLowerCase()).some((x) => dict.words.has(x) && !dict.words.get(x).rare)
+function isRareWord(dict, raw) {
+  if (/^[A-Z]/.test(raw) || /['’]/.test(raw) || ROMAN.test(raw)) return false
+  const w = raw.toLowerCase()
+  if (!find(dict, w)) {
+    // Not in the dictionary: only hyphenated words are worth a look.
+    return w.indexOf('-') !== -1 && !w.split('-').every((part) => isEasy(dict, part, 0)) && w.split('-').some((part) => find(dict, part))
+  }
+  if (w.indexOf('-') !== -1 && w.split('-').every((part) => isEasy(dict, part, 0))) return false
+  return !isEasy(dict, w, 0)
 }
 
 /**
@@ -156,15 +205,8 @@ function rarePaths(dict, blocks) {
   const paths = {}
   blocks.forEach((b, bi) => {
     if (!b.tokens) return
-    let sentenceStart = true
     b.tokens.forEach((tk, ti) => {
-      if (tk.w) {
-        if (isRareWord(dict, tk.t, sentenceStart)) paths['blocks[' + bi + '].tokens[' + ti + '].r'] = 1
-        sentenceStart = false
-      } else if (/[.!?]["”’)]*\s*["“‘(]?\s*$|^\s*["“‘(]\s*$/.test(tk.t)) {
-        const prev = ti > 0 ? b.tokens[ti - 1].t : ''
-        sentenceStart = !(tk.t.trim() === '.' && ABBREVIATIONS.test(prev)) // "Mr. Bennet" is not a new sentence
-      }
+      if (tk.w && isRareWord(dict, tk.t)) paths['blocks[' + bi + '].tokens[' + ti + '].r'] = 1
     })
   })
   return paths

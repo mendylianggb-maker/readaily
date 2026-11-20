@@ -44,13 +44,17 @@ const rareIn = (text) => {
   const blocks = [{ type: 'p', tokens: dict.tokenize(text) }]
   return Object.keys(dict.rarePaths(data, blocks)).map((k) => blocks[0].tokens[Number(/tokens\[(\d+)/.exec(k)[1])].t)
 }
-check('rare words are marked', rareIn('He scowled, brandishing the cudgel with trepidation.').join() === 'scowled,brandishing,cudgel,trepidation')
+const rare = (w) => dict.isRareWord(data, w)
+check('rare words are marked', rareIn('He scowled, brandishing the cudgel with trepidation and caprice.').join() === 'scowled,brandishing,cudgel,trepidation,caprice')
 check('everyday and exam-list words are not', rareIn('It is a truth universally acknowledged that she was nervous and discontented.').length === 0)
-check('a common base form makes its forms common (was -> be)', !dict.isRareWord(data, 'was', false) && !dict.isRareWord(data, 'went', false))
-check('a common stem makes a derived word common (impatiently)', !dict.isRareWord(data, 'impatiently', false))
-check('names in mid-sentence are skipped', rareIn('He met Bennet and Darcy.').length === 0)
-check('"Mr." does not start a new sentence', rareIn('Then Mr. Bennet left.').length === 0)
-check('a capitalized rare word at sentence start is marked', rareIn('He paused. “Trepidation,” she said.').join() === 'Trepidation')
+check('forms of common words are not (was, went)', !rare('was') && !rare('went'))
+check('contractions are not (you\'re, don’t)', !rare("you're") && !rare('don’t'))
+check('prefixes on common words are not (unseen, unheard, reconnect)', !rare('unseen') && !rare('unheard') && !rare('reconnect'))
+check('suffixes on common words are not (realness, lovable, impatiently, validation)', !rare('realness') && !rare('lovable') && !rare('impatiently') && !rare('validation'))
+check('compounds of common words are not (bedtime, toolbox, meltdown)', !rare('bedtime') && !rare('toolbox') && !rare('meltdown'))
+check('but a rare word is not split into chance parts (cap + rice)', rare('caprice'))
+check('hyphenated words of common parts are not (decision-making)', !rare('decision-making'))
+check('capitalized words (names) and roman numerals are not', rareIn('Ethan met Bennet. Trepidation, chapter xii.').length === 0)
 check('a paths object updates only the rare tokens', Object.keys(dict.rarePaths(data, [{ type: 'h' }, { type: 'p', tokens: dict.tokenize('A cudgel.') }]))[0] === 'blocks[1].tokens[2].r')
 
 section('Built data')
