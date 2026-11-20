@@ -57,10 +57,11 @@ const CONSONANT = /[bcdfghjklmnpqrstvwxz]/
  */
 function stems(w) {
   const out = []
-  const add = (s) => { if (s && s.length > 1 && out.indexOf(s) === -1) out.push(s) }
+  // Bases keep 3+ letters (so "ber" does not become "be"), except goes -> go, does -> do.
+  const add = (s, min) => { if (s && s.length >= (min || 3) && out.indexOf(s) === -1) out.push(s) }
   const undouble = (s) => (s.length > 2 && s[s.length - 1] === s[s.length - 2] && CONSONANT.test(s[s.length - 1]) ? s.slice(0, -1) : '')
   if (/ies$/.test(w)) add(w.slice(0, -3) + 'y')
-  if (/(s|x|z|ch|sh|o)es$/.test(w)) add(w.slice(0, -2))
+  if (/(s|x|z|ch|sh|o)es$/.test(w)) add(w.slice(0, -2), 2)
   if (/s$/.test(w) && !/ss$/.test(w)) add(w.slice(0, -1))
   if (/ied$/.test(w)) add(w.slice(0, -3) + 'y')
   if (/ed$/.test(w)) {
@@ -132,12 +133,16 @@ function find(dict, w) {
 }
 
 // Affixes that rarely make a word harder than its base: unseen, realness, lovable.
-const PREFIXES = ['un', 're', 'dis', 'non', 'over', 'under', 'mis', 'out', 'pre', 'inter', 'self', 'im', 'in']
+const PREFIXES = ['un', 're', 'dis', 'non', 'over', 'under', 'mis', 'out', 'pre', 'inter', 'self', 'anti', 'semi', 'multi', 'im', 'in']
 const SUFFIXES = [
   ['ness', ''], ['ful', ''], ['less', ''], ['ment', ''], ['ism', ''], ['ist', ''], ['ity', ''], ['ity', 'e'],
   ['able', ''], ['able', 'e'], ['ible', ''], ['ally', ''], ['ly', ''], ['ive', ''], ['ive', 'e'], ['al', ''],
-  ['ize', ''], ['ise', ''], ['ish', ''], ['ship', ''], ['hood', ''], ['ation', ''], ['ation', 'e'], ['iness', 'y']
+  ['ize', ''], ['ise', ''], ['ship', ''], ['hood', ''], ['ation', ''], ['ation', 'e'], ['iness', 'y'],
+  ['er', ''], ['er', 'e'], ['ate', ''], ['y', ''], ['y', 'e']
 ]
+// Parts of hyphenated words that are affixes, not words: mis-feeling, co-regulation, good-enough-ness, e-book.
+const HYPHEN_AFFIXES = new Set(['mis', 'pre', 'co', 're', 'non', 'self', 'un', 'ex', 'anti', 'semi', 'post', 'sub', 'multi',
+  'over', 'under', 'inter', 'de', 'pro', 'e', 'ness', 'ish', 'like', 'ful', 'less', 'esque'])
 // Second halves that commonly form compounds with a short first half (bed + time).
 const COMPOUND_TAILS = new Set(['time', 'box', 'down', 'up', 'out', 'off', 'over', 'back', 'care', 'set', 'work', 'room', 'house',
   'day', 'night', 'side', 'way', 'where', 'thing', 'body', 'one', 'place', 'ball', 'book', 'line', 'light', 'land', 'yard', 'wear'])
@@ -150,13 +155,17 @@ function isKnown(dict, w) {
   if (!hit.rare) return true
   const base = hit.also && dict.words.get(hit.also.word)
   if (base && !base.rare) return true
-  return stems(w).some((x) => dict.words.has(x) && !dict.words.get(x).rare) // impatiently -> impatient
+  // impatiently -> impatient (but not bely -> be: the base must keep 3+ letters)
+  return stems(w).some((x) => x.length >= 3 && dict.words.has(x) && !dict.words.get(x).rare)
 }
 
 /** Same, also accepting words built from known parts: unseen, playfulness, bedtime. */
 function isEasy(dict, w, depth) {
   if (isKnown(dict, w)) return true
   if (depth >= 2) return false
+  for (const s of stems(w)) {
+    if (s !== w && s.length >= 3 && isEasy(dict, s, depth + 1)) return true // solvers -> solver -> solve
+  }
   for (const p of PREFIXES) {
     if (w.startsWith(p) && w.length - p.length >= 3 && isEasy(dict, w.slice(p.length), depth + 1)) return true
   }
@@ -189,12 +198,11 @@ function isEasy(dict, w, depth) {
 function isRareWord(dict, raw) {
   if (/^[A-Z]/.test(raw) || /['’]/.test(raw) || ROMAN.test(raw)) return false
   const w = raw.toLowerCase()
-  if (!find(dict, w)) {
-    // Not in the dictionary: only hyphenated words are worth a look.
-    return w.indexOf('-') !== -1 && !w.split('-').every((part) => isEasy(dict, part, 0)) && w.split('-').some((part) => find(dict, part))
+  if (w.indexOf('-') !== -1) {
+    // Rare only if some real word in it is rare; affixes and unknown parts are ignored.
+    return w.split('-').some((part) => !HYPHEN_AFFIXES.has(part) && find(dict, part) && !isEasy(dict, part, 0))
   }
-  if (w.indexOf('-') !== -1 && w.split('-').every((part) => isEasy(dict, part, 0))) return false
-  return !isEasy(dict, w, 0)
+  return !!find(dict, w) && !isEasy(dict, w, 0)
 }
 
 /**

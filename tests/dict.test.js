@@ -18,6 +18,7 @@ check('words are marked, punctuation is not', tokens.filter((t) => t.w).map((t) 
 check('Chinese text has no words to tap', dict.tokenize('他说：好的。').every((t) => !t.w))
 
 section('Finding the dictionary form')
+check('bases keep at least 3 letters (ber is not be), except goes -> go', dict.stems('ber').length === 0 && dict.stems('goes').includes('go'))
 check('plain word', look('bank').word === 'bank' && look('bank').defs[0].includes('银行'))
 check('capitalized at sentence start', look('The').word === 'the')
 check('plural -s', look('rooms').word === 'room')
@@ -54,6 +55,10 @@ check('suffixes on common words are not (realness, lovable, impatiently, validat
 check('compounds of common words are not (bedtime, toolbox, meltdown)', !rare('bedtime') && !rare('toolbox') && !rare('meltdown'))
 check('but a rare word is not split into chance parts (cap + rice)', rare('caprice'))
 check('hyphenated words of common parts are not (decision-making)', !rare('decision-making'))
+check('affixes in hyphenated words are ignored (mis-feeling, co-regulation, good-enough-ness, e-book)', !rare('mis-feeling') && !rare('co-regulation') && !rare('good-enough-ness') && !rare('e-book'))
+check('plural + suffix comes off in two steps (problem-solvers, cycle-breakers)', !rare('problem-solvers') && !rare('cycle-breakers'))
+check('a rare word inside a hyphenated word is still marked (self-loathing)', rare('self-loathing'))
+check('affix rules do not reach into rare words (brandishing, belied, berate)', rare('brandishing') && rare('belied') && rare('berate'))
 check('capitalized words (names) and roman numerals are not', rareIn('Ethan met Bennet. Trepidation, chapter xii.').length === 0)
 check('a paths object updates only the rare tokens', Object.keys(dict.rarePaths(data, [{ type: 'h' }, { type: 'p', tokens: dict.tokenize('A cudgel.') }]))[0] === 'blocks[1].tokens[2].r')
 
